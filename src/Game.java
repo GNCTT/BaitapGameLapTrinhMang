@@ -3,15 +3,15 @@ import java.util.Scanner;
 public class Game{
     public static boolean checkDiChuyen(int[][] map,int[][] mayBay,int x,int y){
         int h=0,k=0;
-        if(x<0 || x>= map[0].length || y<0 || y> map.length){
+        if(x-2<0 || x+2>= map[0].length || y-2<0 || y+2>= map.length){
             return false;
         }
         for(int i=y-2;i<y-2+ mayBay.length;i++){
-            for(int j=x-3;j<x-3+mayBay[0].length;j++){
-                if(j<0 || j>= map[0].length || i<0 || i> map.length){
+            for(int j=x-2;j<x-2+mayBay[0].length;j++){
+                if(j<0 || j>= map[0].length || i<0 || i>= map.length){
                     return false;
                 }
-                if(map[i][j]==1 && mayBay[h][k]==2){
+                if(map[j][i]==1 && mayBay[k][h]==2){
                     return false;
                 }
                 k++;
@@ -31,7 +31,7 @@ public class Game{
         }
         int h=0,k=0;
         for(int i=y-2;i<y-2+ mayBay.length;i++){
-            for(int j=x-3;j<x-3+mayBay[0].length;j++){
+            for(int j=x-2;j<x-2+mayBay[0].length;j++){
                 map[i][j]=mayBay[h][k];
                 k++;
             }
@@ -44,22 +44,22 @@ public class Game{
         int[][] map;
         int N=0,M=0;
         Scanner in= new Scanner(System.in);
-        System.out.print("Nhap N: ");
-        N=in.nextInt();
         System.out.print("Nhap M: ");
         M=in.nextInt();
+        System.out.print("Nhap N: ");
+        N=in.nextInt();
         //Create map N>=7 M>=5
         //0: tu do ,1: chuong ngai vat, 2: may bay
         System.out.println("--------------MAP----------------");
-        map= new int[N][M];
+        map= new int[M][N];
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                map[i][j]=0;
+                map[j][i]=0;
             }
         }
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                System.out.print(map[i][j]+ " ");
+                System.out.print(map[j][i]+ " ");
             }
             System.out.println();
         }
@@ -72,13 +72,13 @@ public class Game{
 
         System.out.println("---MAY BAY---");
         int[][] mayBay ={{0,0,2,0,0},
-                {0,2,0,0,2},
-                {2,2,2,2,2},
-                {0,2,0,0,2},
-                {0,0,2,0,0}};
+                         {0,2,0,0,2},
+                         {2,2,2,2,2},
+                         {0,2,0,0,2},
+                         {0,0,2,0,0}};
         for (int i=0;i<mayBay.length;i++){
             for(int j=0;j<mayBay[0].length;j++){
-                System.out.print(mayBay[i][j] + " ");
+                System.out.print(mayBay[j][i] + " ");
             }
             System.out.println();
         }
@@ -105,15 +105,7 @@ public class Game{
                 checkToaDoFalse=false;
             }
         }
-//        int h=0,k=0;
-//        for(int i=y-2;i<y-2+ mayBay.length;i++){
-//            for(int j=x-3;j<x-3+mayBay[0].length;j++){
-//                map[i][j]=mayBay[h][k];
-//                k++;
-//            }
-//            h++;
-//            k=0;
-//        }
+
         System.out.println("---------------MAP---------------");
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
@@ -173,50 +165,49 @@ public class Game{
                 while (check){
                     System.out.print("Nhap Huong Di Chuyen( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
                     int move= in.nextInt();
-                    switch (move){
-                        case 1:
-                            //Di chuyen Len
-                            if(checkDiChuyen(map,mayBay,x,y-1)==false){
-                                System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                            }else{
-                                y--;
-                                updateDiChuyen(map,mayBay,x,y);
-                                check=false;
-                                break;
-                            }
-                        case 2:
-                            //Di Chuyen Phai
-                            if(checkDiChuyen(map,mayBay,x+1,y)==false){
-                                System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                            }else{
-                                x++;
-                                updateDiChuyen(map,mayBay,x,y);
-                                check=false;
-                                break;
-                            }
-                        case 3:
-                            //Di Chuyen Xuong
-                            if(checkDiChuyen(map,mayBay,x,y+1)==false){
-                                System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                            }else{
-                                y++;
-                                updateDiChuyen(map,mayBay,x,y);
-                                check=false;
-                                break;
-                            }
-                        case 4:
-                            //Di Chuyen Trai
-                            if(checkDiChuyen(map,mayBay,x-1,y)==false){
-                                System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                            }else{
-                                x--;
-                                updateDiChuyen(map,mayBay,x,y);
-                                check=false;
-                                break;
-                            }
-                        default:
-                            //Khong Hop Le
-                            System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
+                    if(move==1){
+                        //Di Chuyen Len
+                        if(checkDiChuyen(map,mayBay,x,y-1)==false){
+                            System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
+                        }else{
+                            y--;
+                            updateDiChuyen(map,mayBay,x,y);
+                            check=false;
+                            break;
+                        }
+                    }else if(move==2){
+                        //Di Chuyen Phai
+                        if(checkDiChuyen(map,mayBay,x+1,y)==false){
+                            System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
+                        }else{
+                            x++;
+                            updateDiChuyen(map,mayBay,x,y);
+                            check=false;
+                            break;
+                        }
+                    }else if(move==3){
+                        //Di Chuyen Xuong
+                        if(checkDiChuyen(map,mayBay,x,y+1)==false){
+                            System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
+                        }else{
+                            y++;
+                            updateDiChuyen(map,mayBay,x,y);
+                            check=false;
+                            break;
+                        }
+                    } else if(move==4) {
+                        //Di Chuyen Trai
+                        if(checkDiChuyen(map,mayBay,x-1,y)==false){
+                            System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
+                        }else{
+                            x--;
+                            updateDiChuyen(map,mayBay,x,y);
+                            check=false;
+                            break;
+                        }
+                    }else{
+                        //Khong Hop Le
+                        System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
                     }
                 }
             }
