@@ -1,6 +1,19 @@
 import java.util.Scanner;
 
 public class GameClient {
+    int arr_map[][];
+
+    public GameClient() {
+
+    }
+
+    public void createMap(int width, int height) {
+        this.arr_map = new int[width][height];
+    }
+
+    public void print() {
+
+    }
     public static boolean checkDiChuyen(int[][] map,int[][] mayBay,int x,int y){
         int h=0,k=0;
         if(x-2<0 || x+2>= map[0].length || y-2<0 || y+2>= map.length){
