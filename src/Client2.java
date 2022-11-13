@@ -4,44 +4,30 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
-public class Client {
+public class Client2 {
     private static final int CHECK_PKT_TYPE = 1;
     private static final int BYE_PKT_TYPE = 3;
     private static final int FLAG_PKT_TYPE = 4;
-
-    private static String msv;
-    private static byte[] buffer;
-    private static byte[] type_byte;
-    private static byte[] len_byte;
-
-    private static int data_length;
-    private static byte[] data_byte;
-    private static byte[] data_byte1;
-    private static byte[] data_byte2;
-    private static byte[] pkt_sent;
-    private static byte[] datax = new byte[4];
-    private static byte[] dataN = new byte[4];
-    private static byte[] dataM = new byte[4];
-    private static byte[] dataArrElement;
     public static void main(String[] args) throws Exception {
-        Scanner sc = new Scanner(System.in);
-
 
         Socket clientsocket = new Socket("127.0.0.1", 8080);
         DataInputStream in = new DataInputStream(clientsocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientsocket.getOutputStream());
-        System.out.println("Nhap ma sv:");
-        msv = sc.nextLine();
-        byte[] pkt = make_pkt_hello(0, msv);
-        type_byte = intobyte(0);
-        data_byte = Stringtobyte(msv);
-        data_length = data_byte.length;
-        len_byte = intobyte(data_length);
-        pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
-        out.write(pkt_sent);
-
+        byte[] pkt = make_pkt_hello(0, "19020212");
+        out.write(pkt);
+        System.out.println("have sent pkt 0, " + pkt.length);
+        byte[] buffer;
+        byte[] type_byte;
+        byte[] len_byte;
+        byte[] data_byte = new byte[4];
+        byte[] data_byte1;
+        byte[] data_byte2;
+        byte[] pkt_sent;
+        byte[] datax = new byte[4];
+        byte[] dataN = new byte[4];
+        byte[] dataM = new byte[4];
+        byte[] dataArrElement;
         int count = 0;
         while (true) {
             buffer = new byte[50000];
