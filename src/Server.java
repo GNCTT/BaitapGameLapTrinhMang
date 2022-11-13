@@ -21,6 +21,10 @@ public class Server
 
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
+
+    private int NUM_TRAP = 15;
+
+    private int arr_trap[][];
     private boolean sendFirst;
     private int clientID;
     private int clientID_1;
@@ -29,9 +33,18 @@ public class Server
     private byte pkt_send[];
     private byte type_byte[];
     private byte len_byte[];
+
+    private int sizeOfPacket;
     private byte data_byte[];
 
     private byte ID_byte[];
+    private byte width_byte[];
+    private byte height_byte[];
+
+    private byte num_trap_byte[];
+
+    private byte x_location_trap[];
+    private byte y_location_trap[];
     String arrTest[] = new String[5];
     int arrOut[] = new int[5];
     int index_receive;
@@ -42,6 +55,11 @@ public class Server
         try
         {
             server = new ServerSocket(port);
+            arr_trap = new int[NUM_TRAP][2];
+            for (int i = 0; i < NUM_TRAP; i++) {
+                arr_trap[i][0] = i;
+                arr_trap[i][1] = 1;
+            }
             System.out.println("Server started");
 
             System.out.println("Waiting for a client ...");
@@ -56,10 +74,10 @@ public class Server
             arrTest[3] = "bbbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
             arrTest[4] = "lkjjkljkl";
 
-            for (int i = 0; i < 5; i++) {
-                arrOut[i] = checkPara(arrTest[i]);
-                System.out.print(arrOut[i] + " ");
-            }
+//            for (int i = 0; i < 5; i++) {
+//                arrOut[i] = checkPara(arrTest[i]);
+//                System.out.print(arrOut[i] + " ");
+//            }
 
             System.out.println();
             index_receive = 0;
@@ -83,10 +101,10 @@ public class Server
                     int randIndex = getRandIndex(arrTest.length);
                     String str_send = arrTest[randIndex];
                     arrTest = removeAStrByIndex(randIndex, arrTest);
-                    System.out.println("str_send: " + str_send);
-                    for (int i = 0; i < arrTest.length; i++) {
-                        System.out.print(arrTest[i] + "  ");
-                    }
+//                    System.out.println("str_send: " + str_send);
+//                    for (int i = 0; i < arrTest.length; i++) {
+//                        System.out.print(arrTest[i] + "  ");
+//                    }
                     System.out.println();
                     if (type == HELLO_PKT_TYPE) {
                         String msv = byteToString(data_byte);
@@ -99,16 +117,32 @@ public class Server
                             clientID_1 = clientID;
                             sendFirst = false;
                         }
-                        type_byte = intobyte(1);
-                        ID_byte = intobyte(clientID);
-                        len_byte = intobyte(str_send.length());
-                        data_byte = Stringtobyte(str_send);
+                        type_byte = inttobyte(1);
+                        ID_byte = inttobyte(clientID);
+                        width_byte = inttobyte(WIDTH_MAP_SIZE);
+                        height_byte = inttobyte(HEIGHT_MAP_SIZE);
+                        num_trap_byte = inttobyte(NUM_TRAP);
+                        sizeOfPacket = 4 * (4 + NUM_TRAP * 2);
+                        len_byte = inttobyte(sizeOfPacket);
+
                         if (index_receive == 0) {
-                            ByteBuffer before_send = ByteBuffer.allocate(str_send.length() + 16);
-                            before_send.put(intobyte(0));
-                            before_send.put(intobyte(0));
-                            pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
-                            before_send.put(pkt_send);
+                            System.out.println(sizeOfPacket);
+                            ByteBuffer before_send = ByteBuffer.allocate(sizeOfPacket + 16);
+                            before_send.put(inttobyte(0));
+                            before_send.put(inttobyte(0));
+                            before_send.put(type_byte);
+                            before_send.put(len_byte);
+                            before_send.put(ID_byte);
+                            before_send.put(width_byte);
+                            before_send.put(height_byte);
+                            before_send.put(num_trap_byte);
+                            for (int i = 0; i < NUM_TRAP; i++) {
+                                x_location_trap = inttobyte(arr_trap[i][0]);
+                                y_location_trap = inttobyte(arr_trap[i][1]);
+                                before_send.put(x_location_trap);
+                                before_send.put(y_location_trap);
+                                System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
+                            }
                             out.write(before_send.array());
                             confirm_result = checkPara(str_send);
                         }
@@ -123,15 +157,15 @@ public class Server
                             int spin = getRandIndex(100);
                             if (index_receive == 4 || spin % 2 == 0) {
                                 String flag = "abjfadsfcd";
-                                type_byte = intobyte(4);
-                                len_byte = intobyte(flag.length());
+                                type_byte = inttobyte(4);
+                                len_byte = inttobyte(flag.length());
                                 data_byte = Stringtobyte(flag);
                                 pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
                                 out.write(pkt_send);
                                 break;
                             } else {
-                                type_byte = intobyte(1);
-                                len_byte = intobyte(str_send.length());
+                                type_byte = inttobyte(1);
+                                len_byte = inttobyte(str_send.length());
                                 data_byte = Stringtobyte(str_send);
                                 pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
                                 out.write(pkt_send);
@@ -139,9 +173,9 @@ public class Server
                             }
 
                         } else {
-                            type_byte = intobyte(3);
-                            len_byte = intobyte(4);
-                            data_byte = intobyte(4);
+                            type_byte = inttobyte(3);
+                            len_byte = inttobyte(4);
+                            data_byte = inttobyte(4);
                             pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
                             out.write(pkt_send);
                             break;
@@ -179,7 +213,7 @@ public class Server
         }
         return outarr;
     }
-    static byte[] intobyte(int i) {
+    static byte[] inttobyte(int i) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(i);

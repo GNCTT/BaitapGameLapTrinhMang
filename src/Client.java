@@ -7,14 +7,30 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Client {
-    private static final int CHECK_PKT_TYPE = 1;
+    private static final int CREATE_MAP_PKT = 1;
     private static final int BYE_PKT_TYPE = 3;
     private static final int FLAG_PKT_TYPE = 4;
 
     private static String msv;
+    private static int clientID;
+
+    private static int WIDTH_MAP_SIZE;
+    private static int HEIGHT_MAP_SIZE;
+    private static int num_trap;
+    private static int arr_trap[][];
     private static byte[] buffer;
     private static byte[] type_byte;
     private static byte[] len_byte;
+
+    private static byte ID_byte[];
+
+    private static byte width_map_byte[];
+    private static byte height_map_byte[];
+
+    private static byte num_trap_byte[];
+
+    private static byte x_trap_byte[];
+    private static byte y_trap_byte[];
 
     private static int data_length;
     private static byte[] data_byte;
@@ -27,12 +43,15 @@ public class Client {
     private static byte[] dataArrElement;
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
+        GameClient gameClient = new GameClient();
+
+        gameClient.createMap(20, 20);
 
 
         Socket clientsocket = new Socket("127.0.0.1", 8080);
         DataInputStream in = new DataInputStream(clientsocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientsocket.getOutputStream());
-        System.out.println("Nhap ma sv:");
+        System.out.print("Nhap ma sv:");
         msv = sc.nextLine();
         byte[] pkt = make_pkt_hello(0, msv);
         type_byte = intobyte(0);
@@ -48,9 +67,9 @@ public class Client {
             type_byte = new byte[4];
             in.read(buffer);
             if (count == 0) {
-                type_byte = getBytebyIndex(buffer, 4, 8);
+                type_byte = getBytebyIndex(buffer, 8, 12);
 
-                System.out.println("Helloooo: " + bytetoINT(type_byte));
+                System.out.println("Helloooo: " + bytetoINT(type_byte) );
             }
             if (count != 0) {
                 type_byte = getBytebyIndex(buffer, 0, 4);
@@ -60,10 +79,31 @@ public class Client {
                 System.out.println("???");
                 break;
             }
-            if (type == CHECK_PKT_TYPE || type == 5) {
+            if (type == CREATE_MAP_PKT || type == 5) {
                 if (count == 0) {
-                    byte[] len = getBytebyIndex(buffer, 8, 12);
+                    byte[] len = getBytebyIndex(buffer, 12, 16);
                     int size_data = bytetoINT(len);
+                    System.out.println(size_data);
+                    ID_byte = getBytebyIndex(buffer, 16, 20);
+                    width_map_byte = getBytebyIndex(buffer, 20, 24);
+                    height_map_byte = getBytebyIndex(buffer, 24, 28);
+                    System.out.println(bytetoINT(width_map_byte) + " " + bytetoINT(height_map_byte));
+                    num_trap_byte = getBytebyIndex(buffer, 28, 32);
+                    clientID = bytetoINT(ID_byte);
+                    WIDTH_MAP_SIZE = bytetoINT(width_map_byte);
+                    HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
+                    num_trap = bytetoINT(num_trap_byte);
+                    System.out.println("num_trap: " + num_trap);
+                    arr_trap = new int[num_trap][2];
+                    for (int i = 0; i < num_trap; i++) {
+                        x_trap_byte = getBytebyIndex(buffer, 32 + i * 8, 36 + i * 8);
+                        y_trap_byte = getBytebyIndex(buffer, 36 + i * 8, 40 + i * 8);
+                        arr_trap[i][0] = bytetoINT(x_trap_byte);
+                        arr_trap[i][1] = bytetoINT(y_trap_byte);
+                        System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
+                    }
+                    System.out.println("end");
+
 //                    data_byte = getBytebyIndex(buffer, 16, 16 + size_data);
                     datax = getBytebyIndex(buffer, 12, 16);
                     dataN = getBytebyIndex(buffer, 16, 20);
