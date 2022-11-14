@@ -7,62 +7,21 @@ public class Game {
                             {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
                             {0,2,0,0,2},       //         2  2
                             {0,0,2,0,0}};      //          2
-    int width;
-    int height;
+    static int width;
+    static int height;
+    static int x;
+    static int y;
 
-    public int getHeight() {
-        return height;
-    }
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public static void main(String[] args) {
-        Game game= new Game();
-        game.createMap(10,10);
-        game.renderMap(10,10);
+    public void start(Game game){
+        game.createMap(game.getWidth(), game.getHeight());
+        game.renderMap(game.getWidth(), game.getHeight());
         game.renderPlane();
-        int N=0,M=0;
+        game.nhapToaDo();
+        game.renderMap(game.getWidth(), game.getHeight());
+
         Scanner in= new Scanner(System.in);
-
-
-
-        System.out.println("------------TOA DO---------------");
-        //Dat may bay
-        //Chon vi tri dat
-        System.out.print("Nhap toa do x: ");
-        int x=in.nextInt();
-        System.out.print("Nhap toa do y: ");
-        int y=in.nextInt();
-        System.out.println("Toa do: ["+ x +":"+ y +"]");
-
-        boolean checkToaDoFalse=true;
-        while (checkToaDoFalse){
-            if(checkDiChuyen(map,mayBay,x,y)==false){
-                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!!");
-                System.out.print("Nhap toa do x: ");
-                x=in.nextInt();
-                System.out.print("Nhap toa do y: ");
-                y=in.nextInt();
-                System.out.println("Toa do: ["+ x +":"+ y +"]");
-            }else{
-                updateDiChuyen(map,mayBay,x,y);
-                checkToaDoFalse=false;
-            }
-        }
-
-        System.out.println("---------------MAP---------------");
-        game.renderMap(10,10);
-
         System.out.println("--------------START--------------");
         boolean start=true;
         while (start){
@@ -93,7 +52,7 @@ public class Game {
                 System.out.println("Toa do ban: ["+ i +":"+ j +"]");
                 check=true;
                 while (check){
-                    if(i<0 || i>=N || j<0 || j>M){
+                    if(i<0 || i>=getHeight() || j<0 || j>getWidth()){
                         System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
                         System.out.print("Nhap toa do x can ban: ");
                         i=in.nextInt();
@@ -160,13 +119,91 @@ public class Game {
                     }
                 }
             }
-            for(int i=0;i<N;i++){
-                for(int j=0;j<M;j++){
-                    System.out.print(map[i][j]+ " ");
-                }
-                System.out.println();
+            game.renderMap(game.getWidth(), game.getHeight());
+        }
+
+    }
+
+    public static void main(String[] args) {
+        Game game= new Game(10,10);
+        game.start(game);
+
+    }
+
+    public static void setX(int x) {
+        Game.x = x;
+    }
+
+    public static int getX() {
+        return x;
+    }
+
+    public static int getY() {
+        return y;
+    }
+
+    public static void setY(int y) {
+        Game.y = y;
+    }
+
+    public void nhapToaDo(){
+        Scanner in= new Scanner(System.in);
+        System.out.println("------------TOA DO---------------");
+        //Dat may bay
+        //Chon vi tri dat
+        System.out.println("Nhap toa do dat may bay !!");
+        System.out.print("Nhap toa do x: ");
+        int x= in.nextInt();
+        System.out.print("Nhap toa do y: ");
+        int y=in.nextInt();
+        System.out.println("Toa do: ["+ x +":"+ y +"]");
+
+        boolean checkToaDoFalse=true;
+        while (checkToaDoFalse){
+            if(checkDiChuyen(map,mayBay,x,y)==false){
+                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!!");
+                System.out.print("Nhap toa do x: ");
+                x=in.nextInt();
+                System.out.print("Nhap toa do y: ");
+                y=in.nextInt();
+                System.out.println("Toa do: ["+ x +":"+ y +"]");
+            }else{
+                setX(x);
+                setY(y);
+                updateDiChuyen(map,mayBay,x,y);
+                checkToaDoFalse=false;
             }
         }
+    }
+
+    public Game(int width, int height){
+        this.setWidth(width);
+        this.setHeight(height);
+    }
+
+    public Game(){
+    }
+
+    public static int[][] getMap() {
+        return map;
+    }
+
+
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public void createMap(int width, int height) {
@@ -182,13 +219,14 @@ public class Game {
         System.out.println("---MAY BAY---");
         for (int i=0;i<mayBay.length;i++){
             for(int j=0;j<mayBay[0].length;j++){
-                System.out.print(mayBay[j][i] + " ");
+                System.out.print(mayBay[i][j] + " ");
             }
             System.out.println();
         }
     }
 
     public void renderMap(int width, int height) {
+        System.out.println("---------------MAP---------------");
         for(int i=0;i<height;i++){
             for(int j=0;j<width;j++){
                 System.out.print(map[i][j]+ " ");
