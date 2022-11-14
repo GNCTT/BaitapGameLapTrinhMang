@@ -1,87 +1,41 @@
 import java.util.Scanner;
 
-public class Game{
-    public static boolean checkDiChuyen(int[][] map,int[][] mayBay,int x,int y){
-        int h=0,k=0;
-        if(x-2<0 || x+2>= map[0].length || y-2<0 || y+2>= map.length){
-            return false;
-        }
-        for(int i=y-2;i<y-2+ mayBay.length;i++){
-            for(int j=x-2;j<x-2+mayBay[0].length;j++){
-                if(j<0 || j>= map[0].length || i<0 || i>= map.length){
-                    return false;
-                }
-                if(map[j][i]==1 && mayBay[k][h]==2){
-                    return false;
-                }
-                k++;
-            }
-            h++; k=0;
-        }
-        return true;
+public class Game {
+    static int [][] map;
+    static int[][] mayBay ={{0,0,2,0,0},       //          2
+                            {0,2,0,0,2},       //         2  2
+                            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                            {0,2,0,0,2},       //         2  2
+                            {0,0,2,0,0}};      //          2
+    int width;
+    int height;
+
+    public int getHeight() {
+        return height;
     }
 
-    public static void updateDiChuyen(int[][] map,int[][] mayBay,int x,int y){
-        for(int i=0;i< map.length;i++){
-            for(int j=0;j<map[0].length;j++){
-                if(map[i][j]==2){
-                    map[i][j]=0;
-                }
-            }
-        }
-        int h=0,k=0;
-        for(int i=y-2;i<y-2+ mayBay.length;i++){
-            for(int j=x-2;j<x-2+mayBay[0].length;j++){
-                map[i][j]=mayBay[h][k];
-                k++;
-            }
-            h++;
-            k=0;
-        }
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public static void main(String[] args) {
-        int[][] map;
+        Game game= new Game();
+        game.createMap(10,10);
+        game.renderMap(10,10);
+        game.renderPlane();
         int N=0,M=0;
         Scanner in= new Scanner(System.in);
-        System.out.print("Nhap M: ");
-        M=in.nextInt();
-        System.out.print("Nhap N: ");
-        N=in.nextInt();
-        //Create map N>=7 M>=5
-        //0: tu do ,1: chuong ngai vat, 2: may bay
-        System.out.println("--------------MAP----------------");
-        map= new int[M][N];
-        for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                map[j][i]=0;
-            }
-        }
-        for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                System.out.print(map[j][i]+ " ");
-            }
-            System.out.println();
-        }
-        //may bay
-//          2
-//         2  2
-//        22222      *Tam may bay o toa do [2;2]*
-//         2  2
-//          2
 
-        System.out.println("---MAY BAY---");
-        int[][] mayBay ={{0,0,2,0,0},
-                         {0,2,0,0,2},
-                         {2,2,2,2,2},
-                         {0,2,0,0,2},
-                         {0,0,2,0,0}};
-        for (int i=0;i<mayBay.length;i++){
-            for(int j=0;j<mayBay[0].length;j++){
-                System.out.print(mayBay[j][i] + " ");
-            }
-            System.out.println();
-        }
+
+
         System.out.println("------------TOA DO---------------");
         //Dat may bay
         //Chon vi tri dat
@@ -107,12 +61,7 @@ public class Game{
         }
 
         System.out.println("---------------MAP---------------");
-        for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                System.out.print(map[i][j]+ " ");
-            }
-            System.out.println();
-        }
+        game.renderMap(10,10);
 
         System.out.println("--------------START--------------");
         boolean start=true;
@@ -217,6 +166,74 @@ public class Game{
                 }
                 System.out.println();
             }
+        }
+    }
+
+    public void createMap(int width, int height) {
+        this.map = new int [width][height];
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                map[j][i]=0;
+            }
+        }
+    }
+
+    public void renderPlane() {
+        System.out.println("---MAY BAY---");
+        for (int i=0;i<mayBay.length;i++){
+            for(int j=0;j<mayBay[0].length;j++){
+                System.out.print(mayBay[j][i] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void renderMap(int width, int height) {
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                System.out.print(map[i][j]+ " ");
+            }
+            System.out.println();
+        }
+    }
+
+
+    public static boolean checkDiChuyen(int[][] map,int[][] mayBay,int x,int y){
+        int h=0,k=0;
+        if(x-2<0 || x+2>= map[0].length || y-2<0 || y+2>= map.length){
+            return false;
+        }
+        for(int i=y-2;i<y-2+ mayBay.length;i++){
+            for(int j=x-2;j<x-2+mayBay[0].length;j++){
+                if(j<0 || j>= map[0].length || i<0 || i>= map.length){
+                    return false;
+                }
+                if(map[j][i]==1 && mayBay[k][h]==2){
+                    return false;
+                }
+                k++;
+            }
+            h++; k=0;
+        }
+        return true;
+    }
+
+    public static void updateDiChuyen(int[][] map,int[][] mayBay,int x,int y){
+        for(int i=0;i< map.length;i++){
+            for(int j=0;j<map[0].length;j++){
+                if(map[i][j]==2){
+                    map[i][j]=0;
+                }
+            }
+        }
+        int h=0,k=0;
+        for(int i=y-2;i<y-2+ mayBay.length;i++){
+            for(int j=x-2;j<x-2+mayBay[0].length;j++){
+                map[i][j]=mayBay[h][k];
+                k++;
+            }
+            h++;
+            k=0;
         }
     }
 }
