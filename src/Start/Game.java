@@ -45,7 +45,7 @@ public class Game {
             // chon 1: BAN  2:DI CHUYEN
             System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
             System.out.print("Bạn Chọn: ");
-            int action= game.chon();
+            int action= game.selection();
             boolean check= true;
             // Ban
             if(action==1){
@@ -162,7 +162,7 @@ public class Game {
         }
         swap(ret1,mayBay);
     }
-    public int chon(){
+    public int selection(){
         Scanner in= new Scanner(System.in);
         System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
         System.out.print("Bạn Chọn: ");
@@ -255,7 +255,7 @@ public class Game {
         System.out.println("Toa do ban: ["+ i +":"+ j +"]");
         boolean check=true;
         while (check){
-            if(i<0 || i>=getHeight() || j<0 || j>getWidth()){
+            if(i<0 || i>=getHeight() || j<0 || j>=getWidth()){
                 System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
                 System.out.print("Nhap toa do x can ban: ");
                 i=in.nextInt();
@@ -263,9 +263,15 @@ public class Game {
                 j=in.nextInt();
                 System.out.println("Toa do ban: ["+ i +":"+ j +"]");
             }else {
-                break;
+                System.out.println("Toa Do Ban la : [" + i + ":" + j +"]");
+                if(map[i][j]==2){
+                    mayBay[x-i][y-j]=3;
+                    updateDiChuyen(map,mayBay,x,y);
+                }
+                check=false;
             }
         }
+
     }
 
     public void nhapToaDo(){
@@ -419,7 +425,7 @@ public class Game {
     public static void updateDiChuyen(int[][] map,int[][] mayBay,int x,int y){
         for(int i=0;i< map.length;i++){
             for(int j=0;j<map[0].length;j++){
-                if(map[i][j]==2){
+                if(map[i][j]==2 || map[i][j]==3){
                     map[i][j]=0;
                 }
             }
