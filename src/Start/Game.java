@@ -19,6 +19,48 @@ public class Game {
     static int lastMove=4;
     static int newMove=4;
 
+
+
+    public static void main(String[] args) {
+//        Scanner in= new Scanner(System.in);
+//        int N,M;
+//        M=in.nextInt();
+//        N=in.nextInt();
+        Game game= new Game(10,10);
+        game.start(game);
+
+    }
+
+    public void start(Game game){
+        game.createMap(game.getWidth(), game.getHeight());
+        game.renderMap(game.getWidth(), game.getHeight());
+        game.renderPlane();
+        game.nhapToaDo();
+        game.renderMap(game.getWidth(), game.getHeight());
+
+        System.out.println("--------------START--------------");
+        Scanner in= new Scanner(System.in);
+        boolean start=true;
+        while (start){
+            // chon 1: BAN  2:DI CHUYEN
+            System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
+            System.out.print("Bạn Chọn: ");
+            int action= game.chon();
+            boolean check= true;
+            // Ban
+            if(action==1){
+                game.firer();
+            }
+
+            // Di Chuyen
+            if(action==2){
+                game.move();
+            }
+            game.renderMap(game.getWidth(), game.getHeight());
+        }
+
+    }
+
     public void updateHuong(int newMove, int lastMove){
         if (lastMove==1){
             if(newMove==2){
@@ -66,82 +108,60 @@ public class Game {
         }
     }
 
-    public void rotateRight(){
-        int[][] ret=getMayBay();
-        for (int i = 0; i < mayBay.length; ++i) {
-            for (int j = 0; j < mayBay.length; ++j) {
-                mayBay[i][j]=ret[mayBay.length-j-1][i];
+    public void swap(int[][] New, int[][] Old){
+        for (int i = 0; i < New.length; ++i) {
+            for (int j = 0; j < New.length; ++j) {
+                Old[i][j]=New[i][j];
             }
         }
+    }
+    public void rotateRight(){
+        int[][] ret1=new int[mayBay.length][mayBay.length];
+        int[][] ret2=new int[mayBay.length][mayBay.length];
+        swap(mayBay,ret2);
+        for (int i = 0; i < mayBay.length; ++i) {
+            for (int j = 0; j < mayBay.length; ++j) {
+                ret1[i][j]=ret2[mayBay.length-j-1][i];
+            }
+        }
+        swap(ret1,mayBay);
     }
 
     public void rotateLeft(){
-        int[][] ret=getMayBay();
+        int[][] ret1=new int[mayBay.length][mayBay.length];
+        int[][] ret2=new int[mayBay.length][mayBay.length];
+        swap(mayBay,ret2);
         for (int i = 0; i < mayBay.length; ++i) {
             for (int j = 0; j < mayBay.length; ++j) {
-                mayBay[i][j]=ret[j][mayBay.length-i-1];
+                ret1[i][j]=ret2[j][mayBay.length-i-1];
             }
         }
+        swap(ret1,mayBay);
     }
 
     public void reverseWidth(){
-        int[][] ret=getMayBay();
+        int[][] ret1=new int[mayBay.length][mayBay.length];
+        int[][] ret2=new int[mayBay.length][mayBay.length];
+        swap(mayBay,ret2);
         for (int i = 0; i < mayBay.length; ++i) {
             for (int j = 0; j < mayBay.length; ++j) {
-                mayBay[i][j]=ret[i][mayBay.length-j-1];
+                ret1[i][j]=ret2[i][mayBay.length-j-1];
             }
         }
+        swap(ret1,mayBay);
     }
 
     public void reverseHeight(){
-        int[][] ret=getMayBay();
+        int[][] ret1=new int[mayBay.length][mayBay.length];
+        int[][] ret2=new int[mayBay.length][mayBay.length];
+        swap(mayBay,ret2);
         for (int i = 0; i < mayBay.length; ++i) {
             for (int j = 0; j < mayBay.length; ++j) {
-                mayBay[i][j] = ret[mayBay.length-i-1][j];
+                ret1[i][j] = ret2[mayBay.length-i-1][j];
             }
         }
+        swap(ret1,mayBay);
     }
-
-    public static void main(String[] args) {
-//        Scanner in= new Scanner(System.in);
-//        int N,M;
-//        M=in.nextInt();
-//        N=in.nextInt();
-        Game game= new Game(10,10);
-        game.start(game);
-
-    }
-
-    public void start(Game game){
-        game.createMap(game.getWidth(), game.getHeight());
-        game.renderMap(game.getWidth(), game.getHeight());
-        game.renderPlane();
-        game.nhapToaDo();
-        game.renderMap(game.getWidth(), game.getHeight());
-
-        System.out.println("--------------START--------------");
-        Scanner in= new Scanner(System.in);
-        boolean start=true;
-        while (start){
-            // chon 1: BAN  2:DI CHUYEN
-            System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
-            System.out.print("Bạn Chọn: ");
-            int action= game.chon();
-            boolean check= true;
-            // Ban
-            if(action==1){
-                game.firer();
-            }
-
-            // Di Chuyen
-            if(action==2){
-                game.move();
-            }
-            game.renderMap(game.getWidth(), game.getHeight());
-        }
-
-    }
-
     public int chon(){
         Scanner in= new Scanner(System.in);
         System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
