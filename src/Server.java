@@ -15,9 +15,9 @@ public class Server
 
     private final int HELLO_PKT_TYPE = 0;
     private final int CHECK_PKT_TYPE = 1;
-    private final int RESULT_PKT_TYPE = 2;
+    private final int SET_PLANE_PKT = 2;
     private final int BYE_PKT_TYPE = 3;
-    private final int FLAG_PKT_TYPE = 4;
+    private final int TURN_PKT = 4;
 
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
@@ -25,11 +25,17 @@ public class Server
     private int NUM_TRAP = 15;
 
     private int arr_trap[][];
-    private boolean sendFirst;
     private int clientID;
     private int clientID_1;
     private int clientID_2;
     private byte pkt_from_client[];
+
+    private byte dir_byte[];
+    private int dir_plane;
+    private byte x_location_byte[];
+    private int x_location;
+    private byte y_location_byte[];
+    private int y_location;
     private byte pkt_send[];
     private byte type_byte[];
     private byte len_byte[];
@@ -51,11 +57,13 @@ public class Server
 
     public Server(int port)
     {
-        sendFirst = true;
         try
         {
             server = new ServerSocket(port);
             arr_trap = new int[NUM_TRAP][2];
+            clientID = -1;
+            clientID_1 = -1;
+            clientID_2 = -1;
             for (int i = 0; i < NUM_TRAP; i++) {
                 arr_trap[i][0] = i;
                 arr_trap[i][1] = 1;
@@ -110,12 +118,10 @@ public class Server
                         String msv = byteToString(data_byte);
                         System.out.println(msv);
                         clientID = hashIDFromMSV(msv);
-                        if (!sendFirst) {
-                            clientID_2 = clientID;
-                        }
-                        if (sendFirst) {
+                        if (clientID_1 == -1) {
                             clientID_1 = clientID;
-                            sendFirst = false;
+                        } else {
+                            clientID_2 = clientID;
                         }
                         type_byte = inttobyte(1);
                         ID_byte = inttobyte(clientID);
@@ -147,37 +153,32 @@ public class Server
                             confirm_result = checkPara(str_send);
                         }
                     }
-                    if (type == RESULT_PKT_TYPE) {
+                    if (type == SET_PLANE_PKT) {
                         //get result
-                        int result = byte_int(data_byte);
-                        System.out.println("type: " + type + " result: " + result + " index_receive: " + index_receive);
-
-                        if (result == confirm_result) {
-                            index_receive++;
-                            int spin = getRandIndex(100);
-                            if (index_receive == 4 || spin % 2 == 0) {
-                                String flag = "abjfadsfcd";
-                                type_byte = inttobyte(4);
-                                len_byte = inttobyte(flag.length());
-                                data_byte = Stringtobyte(flag);
-                                pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
-                                out.write(pkt_send);
-                                break;
-                            } else {
-                                type_byte = inttobyte(1);
-                                len_byte = inttobyte(str_send.length());
-                                data_byte = Stringtobyte(str_send);
-                                pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
-                                out.write(pkt_send);
-                                confirm_result = checkPara(str_send);
-                            }
+                        ID_byte = getBytebyIndex(data_byte, 0, 4);
+                        dir_byte = getBytebyIndex(data_byte, 4, 8);
+                        x_location_byte = getBytebyIndex(data_byte, 8,  12);
+                        y_location_byte = getBytebyIndex(data_byte, 12, 16);
+                        clientID = byte_int(ID_byte);
+                        //xac dinh may bay nao
+                        dir_plane = byte_int(dir_byte);
+                        x_location = byte_int(x_location_byte);
+                        y_location = byte_int(y_location_byte);
+                        //check vi tri dat may bay va check thong tin nguoi gui.
+                        System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
+                        boolean checkSetPlane = true;
+                        int result = 1;
+                        if (checkSetPlane) {
 
                         } else {
-                            type_byte = inttobyte(3);
+                            ByteBuffer before_send = ByteBuffer.allocate(12);
+                            type_byte = inttobyte(BYE_PKT_TYPE);
                             len_byte = inttobyte(4);
                             data_byte = inttobyte(4);
-                            pkt_send = make_pkt_send(type_byte, len_byte, data_byte);
-                            out.write(pkt_send);
+                            before_send.put(type_byte);
+                            before_send.put(len_byte);
+                            before_send.put(data_byte);
+                            out.write(before_send.array());
                             break;
                         }
 
@@ -201,10 +202,6 @@ public class Server
         }
     }
 
-    public static void main(String args[])
-    {
-        Server server = new Server(8080);
-    }
 
     public static byte[] getBytebyIndex(byte[] bytes, int index1, int index2) {
         byte[] outarr = new byte[index2 - index1];
@@ -275,5 +272,10 @@ public class Server
             s_out += (char)((int)_msv.charAt(i) * 5 % 10 + 49);
         }
         return Integer.valueOf(s_out);
+    }
+
+    public static void main(String args[])
+    {
+        Server server = new Server(8080);
     }
 }

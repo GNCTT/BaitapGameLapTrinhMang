@@ -1,0 +1,5 @@
+game cần có các thuộc tính: clientID, width, height, num_trap, arr_trap, dir_plane, x_location, y_location, valid
+                function: constructor, render, setTrap(arr_trap), setPlaneInput(), boolean check_set_Plane(int dir, x_location, y_location),
+                          set_Plane(int dir, int x_location, int y_location).
+
+
