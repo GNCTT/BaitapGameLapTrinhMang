@@ -208,7 +208,12 @@ public class Function {
         System.out.println("---------------MAP---------------");
         for(int i=0;i<height;i++){
             for(int j=0;j<width;j++){
-                System.out.print(map[i][j]+ " ");
+                if (map[i][j] == 0) {
+                    System.out.print("." + " ");
+                } else {
+                    System.out.print("x" +  " ");
+                }
+//                System.out.print(map[i][j]+ " ");
             }
             System.out.println();
         }
