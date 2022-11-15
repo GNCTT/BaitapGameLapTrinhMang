@@ -26,7 +26,7 @@ public class Game {
 //        int N,M;
 //        M=in.nextInt();
 //        N=in.nextInt();
-        Game game= new Game(10,10);
+        Game game= new Game(15,15);
         game.start(game);
 
     }
@@ -38,13 +38,11 @@ public class Game {
         nhapToaDo();
         renderMap(game.getWidth(), game.getHeight());
 
-        System.out.println("--------------START--------------");
+        System.out.println("------------------------------START---------------------------");
         Scanner in= new Scanner(System.in);
         boolean start=true;
         while (start){
             // chon 1: BAN  2:DI CHUYEN
-            System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
-            System.out.print("Bạn Chọn: ");
             int action= selection();
             boolean check= true;
             // Ban
