@@ -12,6 +12,7 @@ public class Function {
         Scanner in= new Scanner(System.in);
         boolean check=true;
         while (check){
+            System.out.println("-------------------------MOVE--------------------------");
             System.out.print("Nhap Huong Di Chuyen( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
             int move= in.nextInt();
             if(move==1){
@@ -71,6 +72,7 @@ public class Function {
 
     public static void firer(){
         Scanner in= new Scanner(System.in);
+        System.out.println("-------------------------BAN--------------------------");
         System.out.print("Nhap toa do x can ban: ");
         int i=in.nextInt();
         System.out.print("Nhap toa do y can ban: ");
@@ -80,6 +82,7 @@ public class Function {
         while (check){
             if(i<0 || i>=getHeight() || j<0 || j>=getWidth()){
                 System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
+                System.out.println("-------------------------BAN--------------------------");
                 System.out.print("Nhap toa do x can ban: ");
                 i=in.nextInt();
                 System.out.print("Nhap toa do y can ban: ");
@@ -88,7 +91,7 @@ public class Function {
             }else {
                 System.out.println("Toa Do Ban la : [" + i + ":" + j +"]");
                 if(map[i][j]==2){
-                    mayBay[x-i][y-j]=3;
+                    mayBay[2-x+i][2-y+j]=3;
                     updateDiChuyen(map,mayBay,x,y);
                 }
                 check=false;
@@ -98,6 +101,7 @@ public class Function {
 
     public static int selection(){
         Scanner in= new Scanner(System.in);
+        System.out.println("-------------------------LUA CHON--------------------------");
         System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
         System.out.print("Bạn Chọn: ");
         int action= 0;
@@ -106,6 +110,7 @@ public class Function {
         while (check){
             if(action<1 || action>2){
                 System.out.println("Lựa chọn không hợp lệ!!! Vui long chọn lại");
+                System.out.println("-------------------------LUA CHON--------------------------");
                 System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
                 System.out.print("Bạn Chọn: ");
                 action= in.nextInt();
@@ -120,7 +125,7 @@ public class Function {
 
     public static void nhapToaDo(){
         Scanner in= new Scanner(System.in);
-        System.out.println("------------TOA DO---------------");
+        System.out.println("---------------------TOA DO-----------------------");
         //Dat may bay
         //Chon vi tri dat
         System.out.println("Nhap toa do dat may bay !!");
@@ -195,10 +200,16 @@ public class Function {
     }
 
     public static void renderPlane() {
-        System.out.println("---MAY BAY---");
+        System.out.println("-----------------MAY BAY--------------");
         for (int i=0;i<mayBay.length;i++){
             for(int j=0;j<mayBay[0].length;j++){
-                System.out.print(mayBay[i][j] + " ");
+                if(mayBay[i][j]==0){
+                    System.out.print(". ");
+                } else if (mayBay[i][j]==2) {
+                    System.out.print("* ");
+                } else if (mayBay[i][j]==3) {
+                    System.out.print("# ");
+                }
             }
             System.out.println();
         }
@@ -208,7 +219,15 @@ public class Function {
         System.out.println("---------------MAP---------------");
         for(int i=0;i<height;i++){
             for(int j=0;j<width;j++){
-                System.out.print(map[i][j]+ " ");
+                if(map[i][j]==0){
+                    System.out.print(". ");
+                } else if(map[i][j]==1) {
+                    System.out.print("0 ");
+                } else if (map[i][j]==2) {
+                    System.out.print("* ");
+                } else if (map[i][j]==3) {
+                    System.out.print("# ");
+                }
             }
             System.out.println();
         }
