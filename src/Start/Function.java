@@ -120,6 +120,8 @@ public class Function {
                             checkDiChuyen(map,mayBay,x,y+1)==false ){
                         System.out.println("Bạn Không Thể Di Chuyển !! Chỉ Có Thể Bắn !!");
                         return 1;
+                    }else {
+                        return action;
                     }
                 }
             }

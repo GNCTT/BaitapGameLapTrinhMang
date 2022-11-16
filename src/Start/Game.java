@@ -13,6 +13,8 @@ public class Game {
                             {0,2,0,0,2},       //         2  2
                             {0,0,2,0,0}};//          2
 
+    static int[][] trap;
+
     static int width;   // Chieu rong map
     static int height;  // Chieu cao map
     static int x;       //Toa do may bay
