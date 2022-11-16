@@ -67,25 +67,27 @@ public class Function {
         Scanner in= new Scanner(System.in);
         System.out.println("-------------------------BAN--------------------------");
         System.out.print("Nhap toa do x can ban: ");
-        int i=in.nextInt();
-        System.out.print("Nhap toa do y can ban: ");
         int j=in.nextInt();
-        System.out.println("Toa do ban: ["+ i +":"+ j +"]");
+        System.out.print("Nhap toa do y can ban: ");
+        int i=in.nextInt();
+        System.out.println("Toa do ban: ["+ j +":"+ i +"]");
         boolean check=true;
         while (check){
             if(i<0 || i>=getHeight() || j<0 || j>=getWidth()){
                 System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
                 System.out.println("-------------------------BAN--------------------------");
                 System.out.print("Nhap toa do x can ban: ");
-                i=in.nextInt();
-                System.out.print("Nhap toa do y can ban: ");
                 j=in.nextInt();
-                System.out.println("Toa do ban: ["+ i +":"+ j +"]");
+                System.out.print("Nhap toa do y can ban: ");
+                i=in.nextInt();
+                System.out.println("Toa do ban: ["+ j +":"+ i +"]");
             }else {
-                System.out.println("Toa Do Ban la : [" + i + ":" + j +"]");
+                System.out.println("Toa Do Ban la : [" + j + ":" + i +"]");
                 if(map[i][j]==2){
-                    mayBay[2-x+i][2-y+j]=3;
+                    mayBay[2-y+i][2-x+j]=3;
                     updateDiChuyen(map,mayBay,x,y);
+                } else if (map[i][j]==0) {
+                    map[i][j]=4;
                 }
                 check=false;
             }
@@ -109,7 +111,17 @@ public class Function {
                 action= in.nextInt();
             }else {
                 System.out.println("Bạn đã chọn số: "+ action);
-                return action;
+                if(action==1){
+                    return action;
+                }else {
+                    if(checkDiChuyen(map,mayBay,x-1,y)==false &&
+                            checkDiChuyen(map,mayBay,x+1,y)==false &&
+                            checkDiChuyen(map,mayBay,x,y-1)==false &&
+                            checkDiChuyen(map,mayBay,x,y+1)==false ){
+                        System.out.println("Bạn Không Thể Di Chuyển !! Chỉ Có Thể Bắn !!");
+                        return 1;
+                    }
+                }
             }
         }
         return action;
@@ -186,7 +198,9 @@ public class Function {
                 if(j<0 || j>= map[0].length || i<0 || i>= map.length){
                     return false;
                 }
-                if(map[j][i]==1 && mayBay[k][h]==2){
+                if(map[i][j]==1 && mayBay[h][k]==2||map[i][j]==1 && mayBay[h][k]==3){
+                    return false;
+                }if(map[i][j]==4 && mayBay[h][k]==2 ||map[i][j]==4 && mayBay[h][k]==3){
                     return false;
                 }
                 k++;
@@ -207,8 +221,12 @@ public class Function {
         int h=0,k=0;
         for(int i=y-2;i<y-2+ mayBay.length;i++){
             for(int j=x-2;j<x-2+mayBay[0].length;j++){
-                map[i][j]=mayBay[h][k];
-                k++;
+                if(map[i][j]!=1 && map[i][j]!=4){
+                    map[i][j]=mayBay[h][k];
+                    k++;
+                }else {
+                    k++;
+                }
             }
             h++;
             k=0;
@@ -218,7 +236,7 @@ public class Function {
         map = new int [width][height];
         for(int i=0;i<height;i++){
             for(int j=0;j<width;j++){
-                map[j][i]=0;
+                map[i][j]=0;
             }
         }
     }
@@ -241,17 +259,75 @@ public class Function {
 
     public static void renderMap(int width, int height) {
         System.out.println("---------------MAP---------------");
-        for(int i=0;i<height;i++){
-            for(int j=0;j<width;j++){
-                if(map[i][j]==0){
-                    System.out.print(". ");
-                } else if(map[i][j]==1) {
-                    System.out.print("0 ");
-                } else if (map[i][j]==2) {
-                    System.out.print("* ");
-                } else if (map[i][j]==3) {
-                    System.out.print("# ");
+        int count=0;
+        for(int i=-1;i<=height;i++){
+            for(int j=-1;j<=width;j++){
+                if(i==-1 ){
+                    if(j==-1){
+                        System.out.print("   ");
+                    } else if (j==width) {
+                        System.out.print("  ");
+                    }else if(j>=0 && j<10){
+                        System.out.print(j + "  ");
+                    }else if(j>=10 && j<height){
+                        System.out.print(j + " ");
+                    }
+                } else if (i>=0 && i<10){
+                    if(j==-1){
+                        System.out.print(i + "  ");
+                    } else if (j>=0 && j<width) {
+                        if(map[i][j]==0){
+                            System.out.print(".  ");
+                        } else if(map[i][j]==1) {
+                            System.out.print("0  ");
+                        } else if (map[i][j]==2) {
+                            System.out.print("*  ");
+                        } else if (map[i][j]==3) {
+                            System.out.print("#  ");
+                        }else if (map[i][j]==4) {
+                            System.out.print("&  ");
+                        }
+                    }else if (j==width) {
+                        System.out.print(i + "  ");
+                    }
+                }else if (i>=10 && i<width){
+                    if(j==-1){
+                        System.out.print(i + " ");
+                    } else if (j>=0 && j<width) {
+                        if(map[i][j]==0){
+                            System.out.print(".  ");
+                        } else if(map[i][j]==1) {
+                            System.out.print("0  ");
+                        } else if (map[i][j]==2) {
+                            System.out.print("*  ");
+                        } else if (map[i][j]==3) {
+                            System.out.print("#  ");
+                        }else if (map[i][j]==4) {
+                            System.out.print("&  ");
+                        }
+                    } else if (j==width) {
+                        System.out.print(i + "  ");
+                    }
+                } else if (i==height) {
+                    if(j==-1){
+                        System.out.print("   ");
+                    } else if (j==width) {
+                        System.out.print("  ");
+                    }else if(j>=0 && j<10){
+                        System.out.print(j + "  ");
+                    }else if(j>=10 && j<height){
+                        System.out.print(j + " ");
+                    }
                 }
+//                if(map[i][j]==0){
+//                    System.out.print(". ");
+//                } else if(map[i][j]==1) {
+//                    System.out.print("0 ");
+//                } else if (map[i][j]==2) {
+//                    System.out.print("* ");
+//                } else if (map[i][j]==3) {
+//                    System.out.print("# ");
+//                }
             }
             System.out.println();
         }
