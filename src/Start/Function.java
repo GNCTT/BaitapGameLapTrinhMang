@@ -1,5 +1,6 @@
 package Start;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import static Start.Game.*;
@@ -85,6 +86,7 @@ public class Function {
                 System.out.println("Toa Do Ban la : [" + j + ":" + i +"]");
                 if(map[i][j]==2){
                     mayBay[2-y+i][2-x+j]=3;
+                    map[i][j]=4;
                     updateDiChuyen(map,mayBay,x,y);
                 } else if (map[i][j]==0) {
                     map[i][j]=4;
@@ -94,6 +96,37 @@ public class Function {
         }
     }
 
+    public static void addTrap(){
+        trap=new int[getWidth()][2];
+        int count=0;
+        Random generator = new Random();
+        int num=0;
+        boolean check=true;
+        while (count<getWidth()){
+            for (int i=0;i<getHeight();i++){
+                for (int j=0;j<getWidth();j++){
+                    if (count>=getWidth()){
+                        check=false;
+                        break;
+                    }
+                    num=generator.nextInt(30)+1;
+                    if(num<=2){
+                        map[i][j]=1;
+                        trap[count][0]=j;
+                        trap[count][1]=i;
+                        count++;
+                        if (count>=getWidth()){
+                            check=false;
+                            break;
+                        }
+                    }
+                }
+                if(check==false){
+                    break;
+                }
+            }
+        }
+    }
     public static int selection(){
         Scanner in= new Scanner(System.in);
         System.out.println("-------------------------LUA CHON--------------------------");
@@ -159,7 +192,6 @@ public class Function {
         System.out.print("Nhap toa do y: ");
         int y=in.nextInt();
         System.out.println("Toa do: ["+ x +":"+ y +"]");
-
         boolean checkToaDoFalse=true;
         while (checkToaDoFalse){
             if(checkDiChuyen(map,mayBay,x,y)==false){
@@ -235,7 +267,7 @@ public class Function {
         }
     }
     public static void createMap(int width, int height) {
-        map = new int [width][height];
+        map = new int [getHeight()][getWidth()];
         for(int i=0;i<height;i++){
             for(int j=0;j<width;j++){
                 map[i][j]=0;

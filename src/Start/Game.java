@@ -13,7 +13,6 @@ public class Game {
                             {0,2,0,0,2},       //         2  2
                             {0,0,2,0,0}};//          2
 
-    static int[][] trap;
 
     static int width;   // Chieu rong map
     static int height;  // Chieu cao map
@@ -24,7 +23,7 @@ public class Game {
 
     static int clientID;
 
-
+    static int[][] trap;
 
     public static void main(String[] args) {
 //        Scanner in= new Scanner(System.in);
@@ -42,6 +41,7 @@ public class Game {
 
     public void start(Game game){
         createMap(game.getWidth(), game.getHeight());
+        addTrap();
         renderMap(game.getWidth(), game.getHeight());
         renderPlane();
         nhapToaDo();
@@ -72,6 +72,10 @@ public class Game {
         }
 
     }
+
+    public static int getClientID() { return clientID; }
+
+    public static void setClientID(int clientID) { Game.clientID = clientID; }
 
     public static void setLastMove(int lastMove) {
         Game.lastMove = lastMove;
@@ -114,8 +118,7 @@ public class Game {
         this.setHeight(height);
     }
 
-    public Game(){
-    }
+    public Game(){}
     public static int[][] getMap() {
         return map;
     }
