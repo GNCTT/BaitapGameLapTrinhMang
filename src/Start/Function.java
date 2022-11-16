@@ -21,8 +21,6 @@ public class Function {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
                 }else{
                     y--;
-                    setNewMove(1);
-                    updateHuong(getNewMove(),getLastMove());
                     updateDiChuyen(map,mayBay,x,y);
                     check=false;
                     break;
@@ -33,8 +31,6 @@ public class Function {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
                 }else{
                     x++;
-                    setNewMove(2);
-                    updateHuong(getNewMove(),getLastMove());
                     updateDiChuyen(map,mayBay,x,y);
                     check=false;
                     break;
@@ -45,7 +41,6 @@ public class Function {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
                 }else{
                     y++;
-                    setNewMove(3);
                     updateHuong(getNewMove(),getLastMove());
                     updateDiChuyen(map,mayBay,x,y);
                     check=false;
@@ -57,8 +52,6 @@ public class Function {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
                 }else{
                     x--;
-                    setNewMove(4);
-                    updateHuong(getNewMove(),getLastMove());
                     updateDiChuyen(map,mayBay,x,y);
                     check=false;
                     break;
@@ -122,6 +115,24 @@ public class Function {
         return action;
     }
 
+    public static void chonHuongMayBay(){
+        Scanner in= new Scanner(System.in);
+        boolean check=true;
+        while (check){
+            System.out.println("-------------------------Chọn Hướng Máy Bay--------------------------");
+            System.out.print("Nhap Huong ( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
+            int move= in.nextInt();
+            if(move>=1 && move<=4){
+                setNewMove(move);
+                updateHuong(getNewMove(),getLastMove());
+                updateDiChuyen(map,mayBay,x,y);
+                check=false;
+            }else{
+                //Khong Hop Le
+                System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
+            }
+        }
+    }
 
     public static void nhapToaDo(){
         Scanner in= new Scanner(System.in);
@@ -151,6 +162,19 @@ public class Function {
                 checkToaDoFalse=false;
             }
         }
+    }
+    public static void chuongNgaiVat(){
+
+    }
+    public static boolean checkLose(){
+        for (int i=0;i<mayBay.length;i++){
+            for (int j=0;j<mayBay.length;j++){
+                if(mayBay[i][j]==2){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     public static boolean checkDiChuyen(int[][] map,int[][] mayBay,int x,int y){
         int h=0,k=0;

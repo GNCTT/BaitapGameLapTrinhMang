@@ -26,22 +26,31 @@ public class Game {
 //        int N,M;
 //        M=in.nextInt();
 //        N=in.nextInt();
-        Game game= new Game(15,15);
+
+        Game game= new Game(width,height);
+        game.setWidth(15);
+        game.setHeight(15);
         game.start(game);
 
     }
+
 
     public void start(Game game){
         createMap(game.getWidth(), game.getHeight());
         renderMap(game.getWidth(), game.getHeight());
         renderPlane();
         nhapToaDo();
+        chonHuongMayBay();
         renderMap(game.getWidth(), game.getHeight());
 
         System.out.println("------------------------------START---------------------------");
         Scanner in= new Scanner(System.in);
         boolean start=true;
         while (start){
+            if(checkLose()==true){
+                System.out.println("------------------ĐÃ THUA-------------------");
+                break;
+            }
             // chon 1: BAN  2:DI CHUYEN
             int action= selection();
             boolean check= true;
