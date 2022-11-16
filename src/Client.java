@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+
 public class Client {
     private static final int CREATE_MAP_PKT = 1;
 
