@@ -9,7 +9,7 @@ public class Game {
     static int [][] map;
     static int[][] mayBay ={{0,0,2,0,0},       //          2
                             {0,2,0,0,2},       //         2  2
-                            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                            {2,2,2,2,0},       //        22222      *Tam may bay o toa do [2;2]*
                             {0,2,0,0,2},       //         2  2
                             {0,0,2,0,0}};//          2
 
@@ -32,8 +32,8 @@ public class Game {
 //        N=in.nextInt();
 
         Game game= new Game(width,height);
-        game.setWidth(15);
-        game.setHeight(15);
+        game.setWidth(20);
+        game.setHeight(20);
         game.start(game);
 
     }
@@ -68,7 +68,9 @@ public class Game {
             if(action==2){
                 move();
             }
+            renderPlane();
             renderMap(game.getWidth(), game.getHeight());
+
         }
 
     }

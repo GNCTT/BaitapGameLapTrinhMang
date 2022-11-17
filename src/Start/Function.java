@@ -280,11 +280,11 @@ public class Function {
         for (int i=0;i<mayBay.length;i++){
             for(int j=0;j<mayBay[0].length;j++){
                 if(mayBay[i][j]==0){
-                    System.out.print(". ");
+                    System.out.print(".  ");
                 } else if (mayBay[i][j]==2) {
-                    System.out.print("* ");
+                    System.out.print("*  ");
                 } else if (mayBay[i][j]==3) {
-                    System.out.print("# ");
+                    System.out.print("#  ");
                 }
             }
             System.out.println();
@@ -292,7 +292,7 @@ public class Function {
     }
 
     public static void renderMap(int width, int height) {
-        System.out.println("---------------MAP---------------");
+        System.out.println("-------------------------MAP------------------------");
         int count=0;
         for(int i=-1;i<=height;i++){
             for(int j=-1;j<=width;j++){
@@ -313,7 +313,7 @@ public class Function {
                         if(map[i][j]==0){
                             System.out.print(".  ");
                         } else if(map[i][j]==1) {
-                            System.out.print("0  ");
+                            System.out.print("=  ");
                         } else if (map[i][j]==2) {
                             System.out.print("*  ");
                         } else if (map[i][j]==3) {
@@ -331,7 +331,7 @@ public class Function {
                         if(map[i][j]==0){
                             System.out.print(".  ");
                         } else if(map[i][j]==1) {
-                            System.out.print("0  ");
+                            System.out.print("=  ");
                         } else if (map[i][j]==2) {
                             System.out.print("*  ");
                         } else if (map[i][j]==3) {
