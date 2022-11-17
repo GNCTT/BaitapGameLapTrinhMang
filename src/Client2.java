@@ -54,8 +54,11 @@ public class Client2 {
     private static byte[] dataN = new byte[4];
     private static byte[] dataM = new byte[4];
     private static byte[] dataArrElement;
+
+    private static Game gameClient;
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
+        gameClient = new Game();
 //        GameClient gameClient = new GameClient();
 //
 //        gameClient.createMap(20, 20);
@@ -106,6 +109,9 @@ public class Client2 {
                     clientID = bytetoINT(ID_byte);
                     WIDTH_MAP_SIZE = bytetoINT(width_map_byte);
                     HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
+                    gameClient.setWidth(WIDTH_MAP_SIZE);
+                    gameClient.setHeight(HEIGHT_MAP_SIZE);
+                    gameClient.createMap();
                     num_trap = bytetoINT(num_trap_byte);
                     System.out.println("num_trap: " + num_trap);
                     arr_trap = new int[num_trap][2];
@@ -199,6 +205,7 @@ public class Client2 {
                 break;
             }
             count++;
+            gameClient.renderMap();
         }
         out.close();
         in.close();

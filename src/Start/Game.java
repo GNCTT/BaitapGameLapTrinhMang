@@ -3,7 +3,7 @@ package Start;
 import java.util.Scanner;
 
 import static Start.Function.*;
-import static Start.RotatePlane.*;
+//import static Start.RotatePlane.*;
 
 public class Game {
     static int [][] map;
@@ -41,12 +41,12 @@ public class Game {
 
 
     public void start(Game game){
-        createMap(game.getWidth(), game.getHeight());
-        renderMap(game.getWidth(), game.getHeight());
+        createMap();
+        renderMap();
         renderPlane();
         nhapToaDo();
         chonHuongMayBay();
-        renderMap(game.getWidth(), game.getHeight());
+        renderMap();
 
         System.out.println("------------------------------START---------------------------");
         Scanner in= new Scanner(System.in);
@@ -68,7 +68,7 @@ public class Game {
             if(action==2){
                 move();
             }
-            renderMap(game.getWidth(), game.getHeight());
+            renderMap();
         }
 
     }
@@ -133,6 +133,91 @@ public class Game {
 
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    public void renderMap() {
+        System.out.println("---------------MAP---------------");
+        int count=0;
+        for(int i=-1;i<=height;i++){
+            for(int j=-1;j<=width;j++){
+                if(i==-1 ){
+                    if(j==-1){
+                        System.out.print("   ");
+                    } else if (j==width) {
+                        System.out.print("  ");
+                    }else if(j>=0 && j<10){
+                        System.out.print(j + "  ");
+                    }else if(j>=10 && j<height){
+                        System.out.print(j + " ");
+                    }
+                } else if (i>=0 && i<10){
+                    if(j==-1){
+                        System.out.print(i + "  ");
+                    } else if (j>=0 && j<width) {
+                        if(map[i][j]==0){
+                            System.out.print(".  ");
+                        } else if(map[i][j]==1) {
+                            System.out.print("0  ");
+                        } else if (map[i][j]==2) {
+                            System.out.print("*  ");
+                        } else if (map[i][j]==3) {
+                            System.out.print("#  ");
+                        }else if (map[i][j]==4) {
+                            System.out.print("&  ");
+                        }
+                    }else if (j==width) {
+                        System.out.print(i + "  ");
+                    }
+                }else if (i>=10 && i<width){
+                    if(j==-1){
+                        System.out.print(i + " ");
+                    } else if (j>=0 && j<width) {
+                        if(map[i][j]==0){
+                            System.out.print(".  ");
+                        } else if(map[i][j]==1) {
+                            System.out.print("0  ");
+                        } else if (map[i][j]==2) {
+                            System.out.print("*  ");
+                        } else if (map[i][j]==3) {
+                            System.out.print("#  ");
+                        }else if (map[i][j]==4) {
+                            System.out.print("&  ");
+                        }
+                    } else if (j==width) {
+                        System.out.print(i + "  ");
+                    }
+                } else if (i==height) {
+                    if(j==-1){
+                        System.out.print("   ");
+                    } else if (j==width) {
+                        System.out.print("  ");
+                    }else if(j>=0 && j<10){
+                        System.out.print(j + "  ");
+                    }else if(j>=10 && j<height){
+                        System.out.print(j + " ");
+                    }
+                }
+//                if(map[i][j]==0){
+//                    System.out.print(". ");
+//                } else if(map[i][j]==1) {
+//                    System.out.print("0 ");
+//                } else if (map[i][j]==2) {
+//                    System.out.print("* ");
+//                } else if (map[i][j]==3) {
+//                    System.out.print("# ");
+//                }
+            }
+            System.out.println();
+        }
+    }
+
+    public void createMap() {
+        map = new int [width][height];
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                map[i][j]=0;
+            }
+        }
     }
 }
 

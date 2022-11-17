@@ -3,15 +3,19 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Server
 {
     private Socket		 socket = null;
+    private ArrayList<Socket> listSockets;
     private ServerSocket server = null;
-    private DataInputStream in	 = null;
+    private ArrayList<DataInputStream> ins;
 
-    private DataOutputStream out	 = null;
+    private ArrayList<DataOutputStream> outs;
+    private DataInputStream in;
+    private DataOutputStream out;
 
     private final int HELLO_PKT_TYPE = 0;
     private final int CHECK_PKT_TYPE = 1;
@@ -55,11 +59,12 @@ public class Server
     int arrOut[] = new int[5];
     int index_receive;
 
-    public Server(int port)
-    {
-        try
-        {
+    public Server(int port) {
+        try {
+            listSockets = new ArrayList<>();
             server = new ServerSocket(port);
+            ins = new ArrayList<>();
+            outs = new ArrayList<>();
             arr_trap = new int[NUM_TRAP][2];
             clientID = -1;
             clientID_1 = -1;
@@ -72,8 +77,6 @@ public class Server
 
             System.out.println("Waiting for a client ...");
 
-            socket = server.accept();
-            System.out.println("Client accepted");
 
             //create arr Strings
             arrTest[0] = "abcdefdaddadsdsdsdr";
@@ -89,113 +92,122 @@ public class Server
 
             System.out.println();
             index_receive = 0;
+            int countClient = 0;
+            while (countClient != 2) {
+                socket = server.accept();
+                in = new DataInputStream(
+                        socket.getInputStream());
+                out = new DataOutputStream(socket.getOutputStream());
+                ins.add(in);
+                outs.add(out);
+                countClient += 1;
+            }
+            System.out.println("Client accepted");
 
-            in = new DataInputStream(
-                    socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
 
             int confirm_result = 0;
-            while (true)
-            {
-                try
-                {
-                    pkt_from_client = new byte[5000];
-                    in.read(pkt_from_client);
-                    type_byte = getBytebyIndex(pkt_from_client, 0, 4);
-                    len_byte = getBytebyIndex(pkt_from_client, 4, 8);
-                    int len = byte_int(len_byte);
-                    data_byte = getBytebyIndex(pkt_from_client, 8, 8 + len);
-                    int type = byte_int(type_byte);
-                    int randIndex = getRandIndex(arrTest.length);
-                    String str_send = arrTest[randIndex];
-                    arrTest = removeAStrByIndex(randIndex, arrTest);
+            while (true) {
+                for (int index = 0; index < ins.size(); index++) {
+                    in = ins.get(index);
+                    out = outs.get(index);
+
+                try {
+                        pkt_from_client = new byte[5000];
+                        in.read(pkt_from_client);
+                        type_byte = getBytebyIndex(pkt_from_client, 0, 4);
+                        len_byte = getBytebyIndex(pkt_from_client, 4, 8);
+                        int len = byte_int(len_byte);
+                        data_byte = getBytebyIndex(pkt_from_client, 8, 8 + len);
+                        int type = byte_int(type_byte);
+                        int randIndex = getRandIndex(arrTest.length);
+                        String str_send = arrTest[randIndex];
+                        arrTest = removeAStrByIndex(randIndex, arrTest);
 //                    System.out.println("str_send: " + str_send);
 //                    for (int i = 0; i < arrTest.length; i++) {
 //                        System.out.print(arrTest[i] + "  ");
 //                    }
-                    System.out.println();
-                    if (type == HELLO_PKT_TYPE) {
-                        String msv = byteToString(data_byte);
-                        System.out.println(msv);
-                        clientID = hashIDFromMSV(msv);
-                        if (clientID_1 == -1) {
-                            clientID_1 = clientID;
-                        } else {
-                            clientID_2 = clientID;
-                        }
-                        type_byte = inttobyte(1);
-                        ID_byte = inttobyte(clientID);
-                        width_byte = inttobyte(WIDTH_MAP_SIZE);
-                        height_byte = inttobyte(HEIGHT_MAP_SIZE);
-                        num_trap_byte = inttobyte(NUM_TRAP);
-                        sizeOfPacket = 4 * (4 + NUM_TRAP * 2);
-                        len_byte = inttobyte(sizeOfPacket);
-
-                        if (index_receive == 0) {
-                            System.out.println(sizeOfPacket);
-                            ByteBuffer before_send = ByteBuffer.allocate(sizeOfPacket + 16);
-                            before_send.put(inttobyte(0));
-                            before_send.put(inttobyte(0));
-                            before_send.put(type_byte);
-                            before_send.put(len_byte);
-                            before_send.put(ID_byte);
-                            before_send.put(width_byte);
-                            before_send.put(height_byte);
-                            before_send.put(num_trap_byte);
-                            for (int i = 0; i < NUM_TRAP; i++) {
-                                x_location_trap = inttobyte(arr_trap[i][0]);
-                                y_location_trap = inttobyte(arr_trap[i][1]);
-                                before_send.put(x_location_trap);
-                                before_send.put(y_location_trap);
-                                System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
+                        System.out.println();
+                        if (type == HELLO_PKT_TYPE) {
+                            String msv = byteToString(data_byte);
+                            System.out.println(msv);
+                            clientID = hashIDFromMSV(msv);
+                            if (clientID_1 == -1) {
+                                clientID_1 = clientID;
+                            } else {
+                                clientID_2 = clientID;
                             }
-                            out.write(before_send.array());
-                            confirm_result = checkPara(str_send);
-                        }
-                    }
-                    if (type == SET_PLANE_PKT) {
-                        //get result
-                        ID_byte = getBytebyIndex(data_byte, 0, 4);
-                        dir_byte = getBytebyIndex(data_byte, 4, 8);
-                        x_location_byte = getBytebyIndex(data_byte, 8,  12);
-                        y_location_byte = getBytebyIndex(data_byte, 12, 16);
-                        clientID = byte_int(ID_byte);
-                        //xac dinh may bay nao
-                        dir_plane = byte_int(dir_byte);
-                        x_location = byte_int(x_location_byte);
-                        y_location = byte_int(y_location_byte);
-                        //check vi tri dat may bay va check thong tin nguoi gui.
-                        System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
-                        boolean checkSetPlane = true;
-                        int result = 1;
-                        if (checkSetPlane) {
+                            type_byte = inttobyte(1);
+                            ID_byte = inttobyte(clientID);
+                            width_byte = inttobyte(WIDTH_MAP_SIZE);
+                            height_byte = inttobyte(HEIGHT_MAP_SIZE);
+                            num_trap_byte = inttobyte(NUM_TRAP);
+                            sizeOfPacket = 4 * (4 + NUM_TRAP * 2);
+                            len_byte = inttobyte(sizeOfPacket);
 
-                        } else {
-                            ByteBuffer before_send = ByteBuffer.allocate(12);
-                            type_byte = inttobyte(BYE_PKT_TYPE);
-                            len_byte = inttobyte(4);
-                            data_byte = inttobyte(4);
-                            before_send.put(type_byte);
-                            before_send.put(len_byte);
-                            before_send.put(data_byte);
-                            out.write(before_send.array());
-                            break;
+                            if (index_receive == 0) {
+                                System.out.println(sizeOfPacket);
+                                ByteBuffer before_send = ByteBuffer.allocate(sizeOfPacket + 16);
+                                before_send.put(inttobyte(0));
+                                before_send.put(inttobyte(0));
+                                before_send.put(type_byte);
+                                before_send.put(len_byte);
+                                before_send.put(ID_byte);
+                                before_send.put(width_byte);
+                                before_send.put(height_byte);
+                                before_send.put(num_trap_byte);
+                                for (int i = 0; i < NUM_TRAP; i++) {
+                                    x_location_trap = inttobyte(arr_trap[i][0]);
+                                    y_location_trap = inttobyte(arr_trap[i][1]);
+                                    before_send.put(x_location_trap);
+                                    before_send.put(y_location_trap);
+                                    System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
+                                }
+                                out.write(before_send.array());
+                            }
+                        }
+                        if (type == SET_PLANE_PKT) {
+                            //get result
+                            ID_byte = getBytebyIndex(data_byte, 0, 4);
+                            dir_byte = getBytebyIndex(data_byte, 4, 8);
+                            x_location_byte = getBytebyIndex(data_byte, 8, 12);
+                            y_location_byte = getBytebyIndex(data_byte, 12, 16);
+                            clientID = byte_int(ID_byte);
+                            //xac dinh may bay nao
+                            dir_plane = byte_int(dir_byte);
+                            x_location = byte_int(x_location_byte);
+                            y_location = byte_int(y_location_byte);
+                            //check vi tri dat may bay va check thong tin nguoi gui.
+                            System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
+                            boolean checkSetPlane = true;
+                            int result = 1;
+                            if (checkSetPlane) {
+
+                            } else {
+                                ByteBuffer before_send = ByteBuffer.allocate(12);
+                                type_byte = inttobyte(BYE_PKT_TYPE);
+                                len_byte = inttobyte(4);
+                                data_byte = inttobyte(4);
+                                before_send.put(type_byte);
+                                before_send.put(len_byte);
+                                before_send.put(data_byte);
+                                out.write(before_send.array());
+                                break;
+                            }
+
                         }
 
-                    }
-                }
-                catch(IOException i)
-                {
+                } catch (IOException i) {
                     System.out.println(i);
                 }
             }
-            System.out.println("Closing connection");
-
-            // close connection
-            socket.close();
-            in.close();
-            out.close();
+            }
+//            System.out.println("Closing connection");
+//            // close connection
+//            socket.close();
+//            in.close();
+//            out.close();
         }
+
         catch(IOException i)
         {
             System.out.println(i);

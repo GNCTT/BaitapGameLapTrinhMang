@@ -1,7 +1,6 @@
 package Start;
 
 import static Start.Game.*;
-import static Start.Game.*;
 
 public class RotatePlane {
     public static void updateHuong(int newMove, int lastMove){
