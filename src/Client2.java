@@ -13,7 +13,7 @@ public class Client2 {
 
     private static final int SET_PLANE_PKT = 2;
     private static final int BYE_PKT_TYPE = 3;
-    private static final int FLAG_PKT_TYPE = 4;
+    private static final int TURN_PKT_TYPE = 4;
 
     private static String msv;
     private static int clientID;
@@ -70,10 +70,10 @@ public class Client2 {
         System.out.print("Nhap ma sv:");
         msv = sc.nextLine();
         byte[] pkt = make_pkt_hello(0, msv);
-        type_byte = intobyte(0);
+        type_byte = int_to_byte(0);
         data_byte = Stringtobyte(msv);
         data_length = data_byte.length;
-        len_byte = intobyte(data_length);
+        len_byte = int_to_byte(data_length);
         pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
         out.write(pkt_sent);
         Game game = new Game();
@@ -129,14 +129,21 @@ public class Client2 {
                     x_location = 3;
                     y_location = 3;
 
+                    gameClient.nhapToaDo();
+                    x_location = gameClient.getX();
+                    y_location = gameClient.getY();
+                    gameClient.chonHuongMayBay();
+                    dir_plane = gameClient.getDir();
+                    System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
+
                     ByteBuffer before_send = ByteBuffer.allocate(24);
-                    type_byte = intobyte(SET_PLANE_PKT);
-                    len_byte = intobyte(16);
+                    type_byte = int_to_byte(SET_PLANE_PKT);
+                    len_byte = int_to_byte(16);
                     System.out.println("---------id " + clientID);
-                    ID_byte = intobyte(clientID);
-                    dir_byte = intobyte(dir_plane);
-                    x_location_byte = intobyte(x_location);
-                    y_location_byte = intobyte(y_location);
+                    ID_byte = int_to_byte(clientID);
+                    dir_byte = int_to_byte(dir_plane);
+                    x_location_byte = int_to_byte(x_location);
+                    y_location_byte = int_to_byte(y_location);
                     before_send.put(type_byte);
                     before_send.put(len_byte);
                     before_send.put(ID_byte);
@@ -180,14 +187,14 @@ public class Client2 {
 
 //                    System.out.println("result is " + result);
                     int result = 0;
-                    type_byte = intobyte(2);
-                    len_byte = intobyte(8);
+                    type_byte = int_to_byte(2);
+                    len_byte = int_to_byte(8);
 //                    if (resultx != -1) {
 //                        resultx += 1;
 //                        resulty += 1;
 //                    }
-                    data_byte1 = intobyte(resultx);
-                    data_byte2 = intobyte(resulty);
+                    data_byte1 = int_to_byte(resultx);
+                    data_byte2 = int_to_byte(resulty);
                     System.out.println("resultx: " + resultx + " resulty: " + resulty);
                     data_byte = make_pkt_data(data_byte1, data_byte2);
                     pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
@@ -196,12 +203,16 @@ public class Client2 {
 
             }
 
-            if (type == FLAG_PKT_TYPE) {
+            if (type == TURN_PKT_TYPE) {
                 byte[] len = getBytebyIndex(buffer, 4, 8);
                 int datasize = bytetoINT(len);
-                byte[] flag = getBytebyIndex(buffer, 8, 8 + datasize);
-                System.out.println(bytetoINT(flag));
-                System.out.println("flag is " + byteToString(flag));
+                ID_byte = getBytebyIndex(buffer, 8, 8 + datasize);
+                int ID_RECEIVE = bytetoINT(ID_byte);
+                if (ID_RECEIVE == clientID) {
+                    System.out.println("hello" + ID_RECEIVE);
+                }
+            }
+            if (type == 10) {
                 break;
             }
             count++;
@@ -234,17 +245,8 @@ public class Client2 {
         return outarr;
     }
 
-    public static int checkPara(String s) {
-        for (int i = 0; i < s.length() / 2; i++) {
-            if (s.charAt(i) != s.charAt(s.length() - i - 1)) {
-                return 0;
-            }
-        }
-        return 1;
-    }
 
-
-    static byte[] intobyte(int i) {
+    static byte[] int_to_byte(int i) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(i);
@@ -252,10 +254,10 @@ public class Client2 {
     }
 
     static byte[] make_pkt_hello(int i, String d) {
-        byte type[] = intobyte(i);
+        byte type[] = int_to_byte(i);
         byte data[] = Stringtobyte(d);
         int datalen = data.length;
-        byte len[] = intobyte(datalen);
+        byte len[] = int_to_byte(datalen);
         ByteBuffer final_array = ByteBuffer.allocate(datalen + 8);
         final_array.put(type);
         final_array.put(len);

@@ -14,7 +14,7 @@ public class Client {
 
     private static final int SET_PLANE_PKT = 2;
     private static final int BYE_PKT_TYPE = 3;
-    private static final int FLAG_PKT_TYPE = 4;
+    private static final int TURN_PKT_TYPE = 4;
 
     private static String msv;
     private static int clientID;
@@ -92,6 +92,7 @@ public class Client {
                 type_byte = getBytebyIndex(buffer, 0, 4);
             }
             int type = bytetoINT(type_byte);
+            System.out.println("type: " + type);
             if (type == BYE_PKT_TYPE) {
                 System.out.println("???");
                 break;
@@ -122,6 +123,8 @@ public class Client {
                         arr_trap[i][1] = bytetoINT(y_trap_byte);
                         System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
                     }
+//                    gameClient.addTrap(arr_trap);
+                    gameClient.renderMap();
                     //them vi tri bay bang truyen 1 mang vao
                     System.out.println("end");
                     //nhan xong du lieu ben server
@@ -130,6 +133,12 @@ public class Client {
                     dir_plane = 1;
                     x_location = 3;
                     y_location = 3;
+                    gameClient.nhapToaDo();
+                    x_location = gameClient.getX();
+                    y_location = gameClient.getY();
+                    gameClient.chonHuongMayBay();
+                    dir_plane = gameClient.getDir();
+                    System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
 //                    game.setPlane()
 
                     ByteBuffer before_send = ByteBuffer.allocate(24);
@@ -199,12 +208,30 @@ public class Client {
 
             }
 
-            if (type == FLAG_PKT_TYPE) {
+            if (type == TURN_PKT_TYPE) {
                 byte[] len = getBytebyIndex(buffer, 4, 8);
                 int datasize = bytetoINT(len);
-                byte[] flag = getBytebyIndex(buffer, 8, 8 + datasize);
-                System.out.println(bytetoINT(flag));
-                System.out.println("flag is " + byteToString(flag));
+                ID_byte = getBytebyIndex(buffer, 8, 8 + datasize);
+                int ID_RECEIVE = bytetoINT(ID_byte);
+                System.out.println("hello_from_213_client");
+                if (ID_RECEIVE == clientID) {
+                    System.out.println("hello" + ID_RECEIVE);
+                }
+
+                int action = gameClient.selection();
+                System.out.println("action: " + action);
+
+                if(action==1){
+                    gameClient.firer();
+                }
+
+                // Di Chuyen
+                if(action==2){
+                    gameClient.move();
+                }
+
+            }
+            if (type == 10) {
                 break;
             }
             count++;

@@ -2,4 +2,31 @@ game cần có các thuộc tính: clientID, width, height, num_trap, arr_trap, 
                 function: constructor, render, setTrap(arr_trap), setPlaneInput(), boolean check_set_Plane(int dir, x_location, y_location),
                           set_Plane(int dir, int x_location, int y_location).
 
+                         boolean checkSetPlane(int x, int y, int dir);
+                         getAction - phai co thuoc tinh action
+                         action == 1 -> dir_move, getDir_Move();
+                         action == 2 -> x_fire, y_fire, getXFire(), getYFire();
+                         update_Shooted(int x, int y);
+                              map[x][y] == 3;
+                         boolean checkValid(int _xNew, int _yNew) {
+                              if (_xNew >0......) {
+                                 if (map[_xNew][_yNew] == 1) {
+                                 return true;
+                              }
+                              }
+                              return false;
+                              }
+
+
+
+                         boolean checkFire();
+                                 trung
+                                 trung bay
+                                 truot
+
+                class gameOther:
+                         thuoc tinh: arr_map
+                                     arr_trap
+                                     arr_shoot
+
 

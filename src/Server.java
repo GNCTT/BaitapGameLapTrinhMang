@@ -21,7 +21,7 @@ public class Server
     private final int CHECK_PKT_TYPE = 1;
     private final int SET_PLANE_PKT = 2;
     private final int BYE_PKT_TYPE = 3;
-    private final int TURN_PKT = 4;
+    private final int TURN_PKT_TYPE = 4;
 
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
@@ -179,8 +179,24 @@ public class Server
                             //check vi tri dat may bay va check thong tin nguoi gui.
                             System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
                             boolean checkSetPlane = true;
-                            int result = 1;
+                            // checkplane method
+
                             if (checkSetPlane) {
+                                ByteBuffer before_send = ByteBuffer.allocate(12);
+                                type_byte = inttobyte(TURN_PKT_TYPE);
+                                len_byte = inttobyte(4);
+                                if (clientID == clientID_1) {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_2;
+                                } else {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_1;
+                                }
+                                System.out.println("---send_to" + clientID);
+                                before_send.put(type_byte);
+                                before_send.put(len_byte);
+                                before_send.put(ID_byte);
+                                out.write(before_send.array());
 
                             } else {
                                 ByteBuffer before_send = ByteBuffer.allocate(12);
