@@ -8,152 +8,150 @@ import static Start.RotatePlane.*;
 
 
 public class Function {
-    public static void move(){
+    public static int move() {
         // 1: Len, 2: Phai, 3: Xuong, 4: Trai
-        Scanner in= new Scanner(System.in);
-        boolean check=true;
-        while (check){
+        Scanner in = new Scanner(System.in);
+        int move=0;
+        boolean check = true;
+        while (check) {
             System.out.println("-------------------------MOVE--------------------------");
             System.out.print("Nhap Huong Di Chuyen( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
-            int move= in.nextInt();
-            if(move==1){
+            move = in.nextInt();
+            if (move == 1) {
                 //Di Chuyen Len
-                if(checkDiChuyen(map,mayBay,x,y-1)==false){
+                if (checkDiChuyen(map, mayBay, x, y - 1) == false) {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
+                } else {
                     y--;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
+                    setDir(move);
+                    updateDiChuyen(map, mayBay, x, y);
+                    check = false;
                     break;
                 }
-            }else if(move==2){
+            } else if (move == 2) {
                 //Di Chuyen Phai
-                if(checkDiChuyen(map,mayBay,x+1,y)==false){
+                if (checkDiChuyen(map, mayBay, x + 1, y) == false) {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
+                } else {
                     x++;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
+                    setDir(move);
+                    updateDiChuyen(map, mayBay, x, y);
+                    check = false;
                     break;
                 }
-            }else if(move==3){
+            } else if (move == 3) {
                 //Di Chuyen Xuong
-                if(checkDiChuyen(map,mayBay,x,y+1)==false){
+                if (checkDiChuyen(map, mayBay, x, y + 1) == false) {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
+                } else {
                     y++;
-                    updateHuong(getNewMove(),getLastMove());
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
+                    setDir(move);
+                    updateHuong(getNewMove(), getLastMove());
+                    updateDiChuyen(map, mayBay, x, y);
+                    check = false;
                     break;
                 }
-            } else if(move==4) {
+            } else if (move == 4) {
                 //Di Chuyen Trai
-                if(checkDiChuyen(map,mayBay,x-1,y)==false){
+                if (checkDiChuyen(map, mayBay, x - 1, y) == false) {
                     System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
+                } else {
                     x--;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
+                    setDir(move);
+                    updateDiChuyen(map, mayBay, x, y);
+                    check = false;
                     break;
                 }
-            }else{
+            } else {
                 //Khong Hop Le
                 System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
             }
         }
+        return move;
     }
 
-    public static void firer(){
-        Scanner in= new Scanner(System.in);
-        System.out.println("-------------------------BAN--------------------------");
-        System.out.print("Nhap toa do x can ban: ");
-        int j=in.nextInt();
-        System.out.print("Nhap toa do y can ban: ");
-        int i=in.nextInt();
-        System.out.println("Toa do ban: ["+ j +":"+ i +"]");
-        boolean check=true;
-        while (check){
-            if(i<0 || i>=getHeight() || j<0 || j>=getWidth()){
-                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
-                System.out.println("-------------------------BAN--------------------------");
-                System.out.print("Nhap toa do x can ban: ");
-                j=in.nextInt();
-                System.out.print("Nhap toa do y can ban: ");
-                i=in.nextInt();
-                System.out.println("Toa do ban: ["+ j +":"+ i +"]");
-            }else {
-                System.out.println("Toa Do Ban la : [" + j + ":" + i +"]");
-                if(map[i][j]==2){
-                    mayBay[2-y+i][2-x+j]=3;
-                    map[i][j]=4;
-                    updateDiChuyen(map,mayBay,x,y);
-                } else if (map[i][j]==0) {
-                    map[i][j]=4;
-                }
-                check=false;
-            }
+    public static int firer(int xFirer, int yFirer) {
+        if (map[getyFirer()][getxFirer()] == 2) {
+            mayBay[2 - y + getyFirer()][2 - x + getxFirer()] = 3;
+            map[getyFirer()][getxFirer()] = 4;
+            updateDiChuyen(map, mayBay, x, y);
+            System.out.println("-----------TRUNG------------");
+            return 1;
+        } else if (map[getyFirer()][getxFirer()] == 0) {
+            map[getyFirer()][getxFirer()] = 4;
+            System.out.println("-----------TRUOT------------");
+            return 0;
+        } else if (map[getyFirer()][getxFirer()] == 1) {
+            System.out.println("-----------TRUNGBAY------------");
+            return 2;
         }
+        return 0;
     }
 
-    public static void addTrap(){
-        trap=new int[getWidth()][2];
-        int count=0;
+    public static void createTrap() {
+        sumTrap = (getHeight() + getWidth()) / 3;
+        trap = new int[getSumTrap()][2];
+        int count = 0;
         Random generator = new Random();
-        int num=0;
-        boolean check=true;
-        while (count<getWidth()){
-            for (int i=0;i<getHeight();i++){
-                for (int j=0;j<getWidth();j++){
-                    if (count>=getWidth()){
-                        check=false;
+        int num = 0;
+        boolean check = true;
+        while (check) {
+
+            for (int i = 0; i < getHeight(); i++) {
+                for (int j = 0; j < getWidth(); j++) {
+                    if (count >= getSumTrap()) {
+                        check = false;
                         break;
                     }
-                    num=generator.nextInt(30)+1;
-                    if(num<=2){
-                        map[i][j]=1;
-                        trap[count][0]=j;
-                        trap[count][1]=i;
+                    num = generator.nextInt(30) + 1;
+                    if (num <= 2) {
+                        trap[count][0] = j;
+                        trap[count][1] = i;
                         count++;
-                        if (count>=getWidth()){
-                            check=false;
+                        if (count >= getSumTrap()) {
+                            check = false;
                             break;
                         }
                     }
                 }
-                if(check==false){
-                    break;
-                }
+
             }
         }
     }
-    public static int selection(){
-        Scanner in= new Scanner(System.in);
+
+    public static void addTrap() {
+        for (int i = 0; i < getSumTrap(); i++) {
+            map[trap[i][0]][trap[i][1]] = 1;
+        }
+    }
+
+    public static int selection() {
+        Scanner in = new Scanner(System.in);
         System.out.println("-------------------------LUA CHON--------------------------");
         System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
         System.out.print("Bạn Chọn: ");
-        int action= 0;
-        boolean check= true;
-        action= in.nextInt();
-        while (check){
-            if(action<1 || action>2){
+        int action = 0;
+        boolean check = true;
+        action = in.nextInt();
+        while (check) {
+            if (action < 1 || action > 2) {
                 System.out.println("Lựa chọn không hợp lệ!!! Vui long chọn lại");
                 System.out.println("-------------------------LUA CHON--------------------------");
                 System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
                 System.out.print("Bạn Chọn: ");
-                action= in.nextInt();
-            }else {
-                System.out.println("Bạn đã chọn số: "+ action);
-                if(action==1){
+                action = in.nextInt();
+            } else {
+                System.out.println("Bạn đã chọn số: " + action);
+                if (action == 1) {
                     return action;
-                }else {
-                    if(checkDiChuyen(map,mayBay,x-1,y)==false &&
-                            checkDiChuyen(map,mayBay,x+1,y)==false &&
-                            checkDiChuyen(map,mayBay,x,y-1)==false &&
-                            checkDiChuyen(map,mayBay,x,y+1)==false ){
+                } else {
+                    if (checkDiChuyen(map, mayBay, x - 1, y) == false &&
+                            checkDiChuyen(map, mayBay, x + 1, y) == false &&
+                            checkDiChuyen(map, mayBay, x, y - 1) == false &&
+                            checkDiChuyen(map, mayBay, x, y + 1) == false) {
                         System.out.println("Bạn Không Thể Di Chuyển !! Chỉ Có Thể Bắn !!");
                         return 1;
-                    }else {
+                    } else {
                         return action;
                     }
                 }
@@ -162,21 +160,51 @@ public class Function {
         return action;
     }
 
-    public static void chonHuongMayBay(){
-        Scanner in= new Scanner(System.in);
-        boolean check=true;
-        while (check){
+    public static int chonHuongMayBay() {
+        Scanner in = new Scanner(System.in);
+        int move = 4;
+        boolean check = true;
+        while (check) {
             System.out.println("-------------------------Chọn Hướng Máy Bay--------------------------");
             System.out.print("Nhap Huong ( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
-            int move= in.nextInt();
-            if(move>=1 && move<=4){
+            move = in.nextInt();
+            if (move >= 1 && move <= 4) {
                 setNewMove(move);
-                updateHuong(getNewMove(),getLastMove());
-                updateDiChuyen(map,mayBay,x,y);
-                check=false;
-            }else{
+                updateHuong(getNewMove(), getLastMove());
+                updateDiChuyen(map, mayBay, x, y);
+                check = false;
+            } else {
                 //Khong Hop Le
                 System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
+            }
+        }
+        return move;
+    }
+    public static void checkSetPlane(){
+        Scanner in= new Scanner(System.in);
+        System.out.println("---------------------TOA DO-----------------------");
+        //Dat may bay
+        //Chon vi tri dat
+        System.out.println("Nhap toa do dat may bay !!");
+        System.out.print("Nhap toa do x: ");
+        int x= in.nextInt();
+        System.out.print("Nhap toa do y: ");
+        int y=in.nextInt();
+        System.out.println("Toa do: ["+ x +":"+ y +"]");
+        boolean checkToaDoFalse=true;
+        while (checkToaDoFalse){
+            if(checkDiChuyen(map,mayBay,x,y)==false){
+                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!!");
+                System.out.print("Nhap toa do x: ");
+                x=in.nextInt();
+                System.out.print("Nhap toa do y: ");
+                y=in.nextInt();
+                System.out.println("Toa do: ["+ x +":"+ y +"]");
+            }else{
+                setX(x);
+                setY(y);
+                updateDiChuyen(map,mayBay,x,y);
+                checkToaDoFalse=false;
             }
         }
     }
@@ -298,17 +326,19 @@ public class Function {
             for(int j=-1;j<=width;j++){
                 if(i==-1 ){
                     if(j==-1){
-                        System.out.print("   ");
+                        System.out.print("y/x ");
                     } else if (j==width) {
                         System.out.print("  ");
                     }else if(j>=0 && j<10){
                         System.out.print(j + "  ");
-                    }else if(j>=10 && j<height){
+                    }else if(j>=10 && j<height-1){
                         System.out.print(j + " ");
+                    }else if(j==height-1){
+                        System.out.print(j + " x/y");
                     }
                 } else if (i>=0 && i<10){
                     if(j==-1){
-                        System.out.print(i + "  ");
+                        System.out.print(i + "   ");
                     } else if (j>=0 && j<width) {
                         if(map[i][j]==0){
                             System.out.print(".  ");
@@ -326,7 +356,7 @@ public class Function {
                     }
                 }else if (i>=10 && i<width){
                     if(j==-1){
-                        System.out.print(i + " ");
+                        System.out.print(i + "  ");
                     } else if (j>=0 && j<width) {
                         if(map[i][j]==0){
                             System.out.print(".  ");
@@ -344,13 +374,15 @@ public class Function {
                     }
                 } else if (i==height) {
                     if(j==-1){
-                        System.out.print("   ");
+                        System.out.print("y/x ");
                     } else if (j==width) {
                         System.out.print("  ");
                     }else if(j>=0 && j<10){
                         System.out.print(j + "  ");
-                    }else if(j>=10 && j<height){
+                    }else if(j>=10 && j<height-1){
                         System.out.print(j + " ");
+                    }else if( j==height-1){
+                        System.out.print(j+" x/y");
                     }
                 }
 //                if(map[i][j]==0){
