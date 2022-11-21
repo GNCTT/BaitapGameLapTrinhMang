@@ -65,7 +65,7 @@ public class Client {
 //        gameClient.createMap(20, 20);
 
 
-        Socket clientsocket = new Socket("127.0.0.1", 8080);
+        Socket clientsocket = new Socket("8.tcp.ngrok.io", 19653);
         DataInputStream in = new DataInputStream(clientsocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientsocket.getOutputStream());
         System.out.print("Nhap ma sv:");
