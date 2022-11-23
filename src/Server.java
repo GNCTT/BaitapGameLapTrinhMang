@@ -1,3 +1,5 @@
+import Start.Game;
+
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -59,8 +61,60 @@ public class Server
     int arrOut[] = new int[5];
     int index_receive;
 
+    Game gameClient_1;
+    Game gameClient_2;
+
+    private int client_Check;
     public Server(int port) {
         try {
+
+//                Socket socket1 = new Socket("104.194.240.16", 8881);
+//                System.out.println("hello");
+//                in = new DataInputStream(socket1.getInputStream());
+//                out = new DataOutputStream(socket1.getOutputStream());
+//                byte[] action_byte = inttobyte(1);
+//                byte[] a_byte = inttobyte(11);
+//                byte[] ip_byte = Stringtobyte("4.tcp.ngrok.io");
+//                byte[] port_byte = inttobyte(12649);
+//                byte[] s_byte = inttobyte(0);
+//                String name_game = "ban_may_bay";
+//                byte[] c_byte = inttobyte(name_game.length());
+//                byte[] name_byte = Stringtobyte(name_game);
+//                String rule = "ban het may bay thi thang";
+//                byte[] d_byte = inttobyte(rule.length());
+//                byte[] rule_byte = Stringtobyte(rule);
+//                String author = "vanh";
+//                byte[] e_byte = inttobyte(author.length());
+//                byte[] author_byte = Stringtobyte(author);
+//                int size = action_byte.length + a_byte.length + ip_byte.length + port_byte.length + s_byte.length + c_byte.length
+//                        + name_byte.length + d_byte.length + rule_byte.length + e_byte.length + author_byte.length;
+//                ByteBuffer before_send2 = ByteBuffer.allocate(size);
+//                before_send2.put(action_byte);
+//                before_send2.put(a_byte);
+//                before_send2.put(ip_byte);
+//                before_send2.put(port_byte);
+//                before_send2.put(s_byte);
+//                before_send2.put(c_byte);
+//                before_send2.put(name_byte);
+//                before_send2.put(d_byte);
+//                before_send2.put(rule_byte);
+//                before_send2.put(e_byte);
+//                before_send2.put(author_byte);
+//                out.write(before_send2.array());
+//                while (true) {
+//                    pkt_from_client = new byte[5000];
+//                    in.read(pkt_from_client);
+//                    type_byte = getBytebyIndex(port_byte, 0, 4);
+//                    int type = byte_int(type_byte);
+//                    System.out.println("type:  " + type);
+//                    if (type == 0) {
+//                        break;
+//                    }
+//                }
+
+            gameClient_1 = new Game(1, 1);
+            gameClient_2 = new Game(1, 1);
+            client_Check = 0;
             listSockets = new ArrayList<>();
             server = new ServerSocket(port);
             ins = new ArrayList<>();
@@ -76,21 +130,6 @@ public class Server
             System.out.println("Server started");
 
             System.out.println("Waiting for a client ...");
-
-
-            //create arr Strings
-            arrTest[0] = "abcdefdaddadsdsdsdr";
-            arrTest[1] = "bcddafkdahfa";
-            arrTest[2] = "aaaaaaaaaaaaaaaaaaaaaaaaa";
-            arrTest[3] = "bbbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-            arrTest[4] = "lkjjkljkl";
-
-//            for (int i = 0; i < 5; i++) {
-//                arrOut[i] = checkPara(arrTest[i]);
-//                System.out.print(arrOut[i] + " ");
-//            }
-
-            System.out.println();
             index_receive = 0;
             int countClient = 0;
             while (countClient != 2) {
@@ -104,8 +143,6 @@ public class Server
             }
             System.out.println("Client accepted");
 
-
-            int confirm_result = 0;
             while (true) {
                 for (int index = 0; index < ins.size(); index++) {
                     in = ins.get(index);
@@ -133,13 +170,23 @@ public class Server
                             clientID = hashIDFromMSV(msv);
                             if (clientID_1 == -1) {
                                 clientID_1 = clientID;
+                                client_Check = 0;
                             } else {
                                 clientID_2 = clientID;
+                                client_Check = 1;
                             }
                             type_byte = inttobyte(1);
                             ID_byte = inttobyte(clientID);
                             width_byte = inttobyte(WIDTH_MAP_SIZE);
                             height_byte = inttobyte(HEIGHT_MAP_SIZE);
+                            if (client_Check == 0) {
+                                gameClient_1.setWidth(WIDTH_MAP_SIZE);
+                                gameClient_1.setHeight(HEIGHT_MAP_SIZE);
+                                //add_trap
+                            } else {
+                                gameClient_2.setWidth(WIDTH_MAP_SIZE);
+                                gameClient_2.setHeight(HEIGHT_MAP_SIZE);
+                            }
                             num_trap_byte = inttobyte(NUM_TRAP);
                             sizeOfPacket = 4 * (4 + NUM_TRAP * 2);
                             len_byte = inttobyte(sizeOfPacket);
@@ -188,6 +235,7 @@ public class Server
                                 if (clientID == clientID_1) {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_2;
+                                    gameClient_1.a
                                 } else {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_1;

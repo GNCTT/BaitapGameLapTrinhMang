@@ -59,12 +59,12 @@ public class Client2 {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         gameClient = new Game();
-//        GameClient gameClient = new GameClient();
+//        GameClient gameClient = new  GameClient();
 //
 //        gameClient.createMap(20, 20);
 
 
-        Socket clientsocket = new Socket("8.tcp.ngrok.io", 19653);
+        Socket clientsocket = new Socket("0.tcp.ngrok.io", 13888);
         DataInputStream in = new DataInputStream(clientsocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientsocket.getOutputStream());
         System.out.print("Nhap ma sv:");
