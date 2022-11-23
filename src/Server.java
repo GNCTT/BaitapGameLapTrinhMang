@@ -25,6 +25,8 @@ public class Server
     private final int BYE_PKT_TYPE = 3;
     private final int TURN_PKT_TYPE = 4;
 
+    private final int PLAY_PKT_TYPE = 5;
+
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
 
@@ -65,6 +67,12 @@ public class Server
     Game gameClient_2;
 
     private int client_Check;
+
+    static int[][] mayBay ={{0,0,2,0,0},       //          2
+            {0,2,0,0,2},       //         2  2
+            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+            {0,2,0,0,2},       //         2  2
+            {0,0,2,0,0}};
     public Server(int port) {
         try {
 
@@ -235,7 +243,6 @@ public class Server
                                 if (clientID == clientID_1) {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_2;
-                                    gameClient_1.a
                                 } else {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_1;
@@ -257,6 +264,10 @@ public class Server
                                 out.write(before_send.array());
                                 break;
                             }
+
+                        }
+
+                        if (type == PLAY_PKT_TYPE) {
 
                         }
 

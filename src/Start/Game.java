@@ -9,10 +9,32 @@ import static Start.RotatePlane.updateHuong;
 public class Game {
     static int [][] map;
     static int[][] mayBay ={{0,0,2,0,0},       //          2
+            {0,2,0,0,2},       //         2  2
+            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+            {0,2,0,0,2},       //         2  2
+            {0,0,2,0,0}};
+    static int[][] mayBay1 ={{0,0,2,0,0},       //          2
                             {0,2,0,0,2},       //         2  2
                             {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
                             {0,2,0,0,2},       //         2  2
-                            {0,0,2,0,0}};//          2
+                            {0,0,2,0,0}};
+    //          2
+    static int[][] mayBay2 ={{0,0,2,0,0},       //          2
+                            {0,2,0,2,0},       //         2  2
+                            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                            {0,2,0,0,2},       //         2  2
+                            {0,0,2,0,0}};
+    static int[][] mayBay3 ={{0,0,2,0,0},       //          2
+            {0,2,0,0,2},       //         2  2
+            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+            {0,2,0,0,2},       //         2  2
+            {0,0,2,0,0}};
+
+    static int[][] mayBay4 ={{0,0,2,0,0},       //          2
+            {0,2,0,0,2},       //         2  2
+            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+            {0,2,0,0,2},       //         2  2
+            {0,0,2,0,0}};
 
     static int[][] trap;
 
@@ -207,15 +229,6 @@ public class Game {
                         System.out.print(j + " ");
                     }
                 }
-//                if(map[i][j]==0){
-//                    System.out.print(". ");
-//                } else if(map[i][j]==1) {
-//                    System.out.print("0 ");
-//                } else if (map[i][j]==2) {
-//                    System.out.print("* ");
-//                } else if (map[i][j]==3) {
-//                    System.out.print("# ");
-//                }
             }
             System.out.println();
         }
@@ -228,6 +241,14 @@ public class Game {
                 map[i][j]=0;
             }
         }
+    }
+
+    public boolean checkSetPlane(int x, int y, int dir) {
+
+        return true;
+    }
+    public void setPlane(int x, int y, int dir) {
+
     }
 
     public void chonHuongMayBay(){
