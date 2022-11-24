@@ -7,46 +7,46 @@ public class RotatePlane {
     public static void updateHuong(int newMove, int lastMove){
         if (lastMove==1){
             if(newMove==2){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateRight();
             }else  if(newMove==3){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 reverseHeight();
             }else if(newMove==4){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateLeft();
             }
         } else if (lastMove==2) {
             if(newMove==1){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateLeft();
             }else if(newMove==3){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateRight();
             }else if(newMove==4){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 reverseWidth();
             }
         } else if (lastMove==3) {
             if(newMove==1){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 reverseHeight();
             }else if(newMove==2){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateLeft();
             }else if(newMove==4){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateRight();
             }
         } else if (lastMove==4) {
             if(newMove==1){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateRight();
             }else if(newMove==2){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 reverseWidth();
             }else if(newMove==3){
-                setLastMove(getNewMove());
+                setLastMove(newMove);
                 rotateLeft();}
         }
     }
