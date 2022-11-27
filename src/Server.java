@@ -29,6 +29,8 @@ public class Server
 
     private final int PKT_RESULT = 6;
 
+    private final int PKT_END = 7;
+
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
 
@@ -347,7 +349,46 @@ public class Server
                                 //check till is_win = true
 
                             } else {
-
+                                ByteBuffer before_send = ByteBuffer.allocate(12);
+                                type_byte = inttobyte(7);
+                                len_byte = inttobyte(8);
+                                //find client win theo client 1 vi du 0 thua 1 hoa 2 thang
+                                // gan ket qua vao result_match
+                                int result_match = 2;
+                                int result_match_1 = -1;
+                                int result_match_2 = -1;
+                                if (result_match == 2) {
+                                    result_match_1 = 2;
+                                    result_match_2 = 0;
+                                } else {
+                                    if (result_match == 1) {
+                                        result_match_1 = 1;
+                                        result_match_2 = 1;
+                                    } else {
+                                        if (result_match == 0) {
+                                            result_match_1 = 0;
+                                            result_match_2 = 2;
+                                        }
+                                    }
+                                }
+                                byte result_match_byte [];
+                                if (turn_check) {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_2;
+                                    turn_check = false;
+                                    result_match_byte = inttobyte(result_match_1);
+                                } else {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_1;
+                                    turn_check = true;
+                                    result_match_byte = inttobyte(result_match_2);
+                                    count_time_client_2 ++;
+                                }
+                                before_send.put(type_byte);
+                                before_send.put(len_byte);
+                                before_send.put(ID_byte);
+                                before_send.put(result_match_byte);
+                                out.write(before_send.array());
                             }
                         }
 

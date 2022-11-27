@@ -18,6 +18,10 @@ public class Client2 {
 
     private static final int PLAY_PKT_TYPE = 5;
 
+    private static final int PKT_RESULT = 6;
+
+    private static final int PKT_END = 7;
+
     private static String msv;
     private static int clientID;
 
@@ -268,6 +272,38 @@ public class Client2 {
 
 
 
+            }
+
+            if (type == PKT_RESULT) {
+                ID_byte = getBytebyIndex(buffer, 8, 12);
+                int ID_receive = bytetoINT(ID_byte);
+                if (ID_receive == clientID) {
+                    //show RESULT
+                    byte result_byte[];
+                    result_byte = getBytebyIndex(buffer, 12, 16);
+                    int result = bytetoINT(result_byte);
+                    System.out.println("result: " + result);
+                }
+            }
+            if (type == PKT_END) {
+                ID_byte = getBytebyIndex(buffer, 8, 12);
+                int ID_receive = bytetoINT(ID_byte);
+                if (ID_receive == clientID) {
+                    byte result_match_byte[];
+                    result_match_byte = getBytebyIndex(buffer, 12, 16);
+                    int result_match = bytetoINT(result_match_byte);
+                    switch (result_match) {
+                        case 0:
+                            System.out.println("you lose");
+                            break;
+                        case 1:
+                            System.out.println("draw");
+                            break;
+                        case 2:
+                            System.out.println("you win");
+                            break;
+                    }
+                }
             }
             if (type == 10) {
                 break;

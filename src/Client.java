@@ -285,6 +285,26 @@ public class Client {
                     System.out.println("result: " + result);
                 }
             }
+            if (type == PKT_END) {
+                ID_byte = getBytebyIndex(buffer, 8, 12);
+                int ID_receive = bytetoINT(ID_byte);
+                if (ID_receive == clientID) {
+                    byte result_match_byte[];
+                    result_match_byte = getBytebyIndex(buffer, 12, 16);
+                    int result_match = bytetoINT(result_match_byte);
+                    switch (result_match) {
+                        case 0:
+                            System.out.println("you lose");
+                            break;
+                        case 1:
+                            System.out.println("draw");
+                            break;
+                        case 2:
+                            System.out.println("you win");
+                            break;
+                    }
+                }
+            }
             if (type == 10) {
                 break;
             }
