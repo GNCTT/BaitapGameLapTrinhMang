@@ -16,6 +16,12 @@ public class Client {
     private static final int BYE_PKT_TYPE = 3;
     private static final int TURN_PKT_TYPE = 4;
 
+    private static final int PLAY_PKT_TYPE = 5;
+
+    private static final int PKT_RESULT = 6;
+
+    private static final int PKT_END = 7;
+
     private static String msv;
     private static int clientID;
 
@@ -55,6 +61,10 @@ public class Client {
     private static byte[] dataN = new byte[4];
     private static byte[] dataM = new byte[4];
     private static byte[] dataArrElement;
+
+    private static byte[] command_byte;
+    private static byte[] x_fire_byte;
+    private static byte[] y_fire_byte;
 
     private static Game gameClient;
     public static void main(String[] args) throws Exception {
@@ -213,23 +223,67 @@ public class Client {
                 int datasize = bytetoINT(len);
                 ID_byte = getBytebyIndex(buffer, 8, 8 + datasize);
                 int ID_RECEIVE = bytetoINT(ID_byte);
-                System.out.println("hello_from_213_client");
+                System.out.println("hello_from_213_client" + ID_RECEIVE + " " + clientID);
                 if (ID_RECEIVE == clientID) {
                     System.out.println("hello" + ID_RECEIVE);
+                    int action = gameClient.selection();
+                    System.out.println("action: " + action);
+                    int x_fire = 0, y_fire = 0;
+                    if(action==2){
+                        gameClient.firer();
+                        //getX_fire, Y_fire
+                        x_fire = 1;
+                        y_fire = 2;
+                    }
+
+                    // Di Chuyen
+                    if(action==1){
+                        gameClient.move();
+                        dir_plane = gameClient.getDir();
+                    }
+
+                    int K = action;
+
+                    //send packet play
+                    type_byte = intobyte(PLAY_PKT_TYPE);
+                    len_byte = intobyte(4 * (2 + K));
+                    ID_byte = intobyte(clientID);
+                    command_byte = intobyte(K);
+
+                    ByteBuffer before_send = ByteBuffer.allocate(8 + 4 *(2 + K));
+                    before_send.put(type_byte);
+                    before_send.put(len_byte);
+                    before_send.put(ID_byte);
+                    before_send.put(command_byte);
+
+                    if (K == 1) {
+                        dir_byte = intobyte(dir_plane);
+                        before_send.put(dir_byte);
+                    } else {
+                        x_fire_byte = intobyte(x_fire);
+                        y_fire_byte = intobyte(y_fire);
+                        before_send.put(x_fire_byte);
+                        before_send.put(y_fire_byte);
+                    }
+
+                    out.write(before_send.array());
                 }
 
-                int action = gameClient.selection();
-                System.out.println("action: " + action);
 
-                if(action==1){
-                    gameClient.firer();
+
+
+            }
+
+            if (type == PKT_RESULT) {
+                ID_byte = getBytebyIndex(buffer, 8, 12);
+                int ID_receive = bytetoINT(ID_byte);
+                if (ID_receive == clientID) {
+                    //show RESULT
+                    byte result_byte[];
+                    result_byte = getBytebyIndex(buffer, 12, 16);
+                    int result = bytetoINT(result_byte);
+                    System.out.println("result: " + result);
                 }
-
-                // Di Chuyen
-                if(action==2){
-                    gameClient.move();
-                }
-
             }
             if (type == 10) {
                 break;

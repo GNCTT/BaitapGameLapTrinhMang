@@ -27,6 +27,8 @@ public class Server
 
     private final int PLAY_PKT_TYPE = 5;
 
+    private final int PKT_RESULT = 6;
+
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
 
@@ -59,10 +61,28 @@ public class Server
 
     private byte x_location_trap[];
     private byte y_location_trap[];
-    String arrTest[] = new String[5];
-    int arrOut[] = new int[5];
+
+    private byte command_byte[];
+
+    private int command;
+
+    private byte x_fire_byte[];
+    private byte y_fire_byte[];
+
+    private int x_fire;
+    private int y_fire;
+
+    private byte result_byte[];
+    private int result;
+
     int index_receive;
 
+    private boolean turn_check;
+    private boolean set_plan_ok;
+    private boolean is_win;
+
+    private int count_time_client_1;
+    private int count_time_client_2;
     Game gameClient_1;
     Game gameClient_2;
 
@@ -131,6 +151,11 @@ public class Server
             clientID = -1;
             clientID_1 = -1;
             clientID_2 = -1;
+            turn_check = true;
+            set_plan_ok = false;
+            is_win = false;
+            count_time_client_1 = 0;
+            count_time_client_2 = 0;
             for (int i = 0; i < NUM_TRAP; i++) {
                 arr_trap[i][0] = i;
                 arr_trap[i][1] = 1;
@@ -164,9 +189,6 @@ public class Server
                         int len = byte_int(len_byte);
                         data_byte = getBytebyIndex(pkt_from_client, 8, 8 + len);
                         int type = byte_int(type_byte);
-                        int randIndex = getRandIndex(arrTest.length);
-                        String str_send = arrTest[randIndex];
-                        arrTest = removeAStrByIndex(randIndex, arrTest);
 //                    System.out.println("str_send: " + str_send);
 //                    for (int i = 0; i < arrTest.length; i++) {
 //                        System.out.print(arrTest[i] + "  ");
@@ -218,6 +240,7 @@ public class Server
                                     System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
                                 }
                                 out.write(before_send.array());
+
                             }
                         }
                         if (type == SET_PLANE_PKT) {
@@ -240,12 +263,15 @@ public class Server
                                 ByteBuffer before_send = ByteBuffer.allocate(12);
                                 type_byte = inttobyte(TURN_PKT_TYPE);
                                 len_byte = inttobyte(4);
-                                if (clientID == clientID_1) {
+                                if (turn_check) {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_2;
+                                    turn_check = false;
                                 } else {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_1;
+                                    set_plan_ok = true;
+                                    turn_check = true;
                                 }
                                 System.out.println("---send_to" + clientID);
                                 before_send.put(type_byte);
@@ -268,7 +294,61 @@ public class Server
                         }
 
                         if (type == PLAY_PKT_TYPE) {
+                            ID_byte = getBytebyIndex(pkt_from_client, 8, 12);
+                            clientID = byte_int(ID_byte);
+                            System.out.println("pkt_play " + clientID);
+                            command_byte = getBytebyIndex(pkt_from_client, 12, 16);
+                            command = byte_int(command_byte);
+                            if (command == 1) {
+                                dir_byte = getBytebyIndex(pkt_from_client, 16, 20);
+                                dir_plane = byte_int(dir_byte);
 
+                                //chang_by_ID
+                            } else {
+                                x_fire_byte = getBytebyIndex(pkt_from_client, 16, 20);
+                                y_fire_byte = getBytebyIndex(pkt_from_client, 20, 24);
+                                //chang_by_ID
+
+                            }
+
+                            //send RESULT//
+//                            type_byte = inttobyte(PKT_RESULT);
+//                            len_byte = inttobyte(8);
+//                            //checkResult
+//                            result = 1;
+//                            result_byte = inttobyte(result);
+//                            ByteBuffer before_send_2 = ByteBuffer.allocate(12);
+//                            before_send_2.put(type_byte);
+//                            before_send_2.put(len_byte);
+//                            before_send_2.put(ID_byte);
+//                            before_send_2.put(result_byte);
+//                            out.write(before_send_2.array());
+
+                            if (!is_win) {
+                                ByteBuffer before_send = ByteBuffer.allocate(12);
+                                type_byte = inttobyte(TURN_PKT_TYPE);
+                                len_byte = inttobyte(4);
+                                if (turn_check) {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_2;
+                                    turn_check = false;
+                                    count_time_client_1 ++;
+                                } else {
+                                    ID_byte = inttobyte(clientID);
+                                    clientID = clientID_1;
+                                    turn_check = true;
+                                    count_time_client_2 ++;
+                                }
+                                System.out.println("---send_to" + clientID);
+                                before_send.put(type_byte);
+                                before_send.put(len_byte);
+                                before_send.put(ID_byte);
+                                out.write(before_send.array());
+                                //check till is_win = true
+
+                            } else {
+
+                            }
                         }
 
                 } catch (IOException i) {
@@ -302,15 +382,6 @@ public class Server
         b.order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(i);
         return b.array();
-    }
-
-    public static int checkPara(String s) {
-        for (int i = 0; i < s.length() / 2; i++) {
-            if (s.charAt(i) != s.charAt(s.length() - i - 1)) {
-                return 0;
-            }
-        }
-        return 1;
     }
 
     static int byte_int(byte[] bytes) {

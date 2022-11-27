@@ -8,12 +8,15 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+
 public class Client2 {
     private static final int CREATE_MAP_PKT = 1;
 
     private static final int SET_PLANE_PKT = 2;
     private static final int BYE_PKT_TYPE = 3;
     private static final int TURN_PKT_TYPE = 4;
+
+    private static final int PLAY_PKT_TYPE = 5;
 
     private static String msv;
     private static int clientID;
@@ -55,11 +58,15 @@ public class Client2 {
     private static byte[] dataM = new byte[4];
     private static byte[] dataArrElement;
 
+    private static byte[] command_byte;
+    private static byte[] x_fire_byte;
+    private static byte[] y_fire_byte;
+
     private static Game gameClient;
     public static void main(String[] args) throws Exception {
+        gameClient = new Game(1, 1);
         Scanner sc = new Scanner(System.in);
-        gameClient = new Game();
-//        GameClient gameClient = new  GameClient();
+//        GameClient gameClient = new GameClient();
 //
 //        gameClient.createMap(20, 20);
 
@@ -70,13 +77,12 @@ public class Client2 {
         System.out.print("Nhap ma sv:");
         msv = sc.nextLine();
         byte[] pkt = make_pkt_hello(0, msv);
-        type_byte = int_to_byte(0);
+        type_byte = intobyte(0);
         data_byte = Stringtobyte(msv);
         data_length = data_byte.length;
-        len_byte = int_to_byte(data_length);
+        len_byte = intobyte(data_length);
         pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
         out.write(pkt_sent);
-        Game game = new Game();
 
         int count = 0;
         while (true) {
@@ -92,6 +98,7 @@ public class Client2 {
                 type_byte = getBytebyIndex(buffer, 0, 4);
             }
             int type = bytetoINT(type_byte);
+            System.out.println("type: " + type);
             if (type == BYE_PKT_TYPE) {
                 System.out.println("???");
                 break;
@@ -109,10 +116,10 @@ public class Client2 {
                     clientID = bytetoINT(ID_byte);
                     WIDTH_MAP_SIZE = bytetoINT(width_map_byte);
                     HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
+                    num_trap = bytetoINT(num_trap_byte);
                     gameClient.setWidth(WIDTH_MAP_SIZE);
                     gameClient.setHeight(HEIGHT_MAP_SIZE);
                     gameClient.createMap();
-                    num_trap = bytetoINT(num_trap_byte);
                     System.out.println("num_trap: " + num_trap);
                     arr_trap = new int[num_trap][2];
                     for (int i = 0; i < num_trap; i++) {
@@ -122,28 +129,32 @@ public class Client2 {
                         arr_trap[i][1] = bytetoINT(y_trap_byte);
                         System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
                     }
+//                    gameClient.addTrap(arr_trap);
+                    gameClient.renderMap();
+                    //them vi tri bay bang truyen 1 mang vao
                     System.out.println("end");
                     //nhan xong du lieu ben server
                     //render map plane, bay, chon vi tri may bay, huong
+//                    game.nhapSetPlane()
                     dir_plane = 1;
                     x_location = 3;
                     y_location = 3;
-
                     gameClient.nhapToaDo();
                     x_location = gameClient.getX();
                     y_location = gameClient.getY();
                     gameClient.chonHuongMayBay();
                     dir_plane = gameClient.getDir();
                     System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
+//                    game.setPlane()
 
                     ByteBuffer before_send = ByteBuffer.allocate(24);
-                    type_byte = int_to_byte(SET_PLANE_PKT);
-                    len_byte = int_to_byte(16);
+                    type_byte = intobyte(SET_PLANE_PKT);
+                    len_byte = intobyte(16);
                     System.out.println("---------id " + clientID);
-                    ID_byte = int_to_byte(clientID);
-                    dir_byte = int_to_byte(dir_plane);
-                    x_location_byte = int_to_byte(x_location);
-                    y_location_byte = int_to_byte(y_location);
+                    ID_byte = intobyte(clientID);
+                    dir_byte = intobyte(dir_plane);
+                    x_location_byte = intobyte(x_location);
+                    y_location_byte = intobyte(y_location);
                     before_send.put(type_byte);
                     before_send.put(len_byte);
                     before_send.put(ID_byte);
@@ -187,14 +198,14 @@ public class Client2 {
 
 //                    System.out.println("result is " + result);
                     int result = 0;
-                    type_byte = int_to_byte(2);
-                    len_byte = int_to_byte(8);
+                    type_byte = intobyte(2);
+                    len_byte = intobyte(8);
 //                    if (resultx != -1) {
 //                        resultx += 1;
 //                        resulty += 1;
 //                    }
-                    data_byte1 = int_to_byte(resultx);
-                    data_byte2 = int_to_byte(resulty);
+                    data_byte1 = intobyte(resultx);
+                    data_byte2 = intobyte(resulty);
                     System.out.println("resultx: " + resultx + " resulty: " + resulty);
                     data_byte = make_pkt_data(data_byte1, data_byte2);
                     pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
@@ -208,9 +219,55 @@ public class Client2 {
                 int datasize = bytetoINT(len);
                 ID_byte = getBytebyIndex(buffer, 8, 8 + datasize);
                 int ID_RECEIVE = bytetoINT(ID_byte);
+                System.out.println("hello_from_213_client" + ID_RECEIVE + " " + clientID);
                 if (ID_RECEIVE == clientID) {
                     System.out.println("hello" + ID_RECEIVE);
+                    int action = gameClient.selection();
+                    System.out.println("action: " + action);
+                    int x_fire = 0, y_fire = 0;
+                    if(action==2){
+                        gameClient.firer();
+                        //getX_fire, Y_fire
+                        x_fire = 1;
+                        y_fire = 2;
+                    }
+
+                    // Di Chuyen
+                    if(action==1){
+                        gameClient.move();
+                        dir_plane = gameClient.getDir();
+                    }
+
+                    int K = action;
+
+                    //send packet play
+                    type_byte = intobyte(PLAY_PKT_TYPE);
+                    len_byte = intobyte(4 * (2 + K));
+                    ID_byte = intobyte(clientID);
+                    command_byte = intobyte(K);
+
+                    ByteBuffer before_send = ByteBuffer.allocate(8 + 4 *(2 + K));
+                    before_send.put(type_byte);
+                    before_send.put(len_byte);
+                    before_send.put(ID_byte);
+                    before_send.put(command_byte);
+
+                    if (K == 1) {
+                        dir_byte = intobyte(dir_plane);
+                        before_send.put(dir_byte);
+                    } else {
+                        x_fire_byte = intobyte(x_fire);
+                        y_fire_byte = intobyte(y_fire);
+                        before_send.put(x_fire_byte);
+                        before_send.put(y_fire_byte);
+                    }
+
+                    out.write(before_send.array());
                 }
+
+
+
+
             }
             if (type == 10) {
                 break;
@@ -245,8 +302,17 @@ public class Client2 {
         return outarr;
     }
 
+    public static int checkPara(String s) {
+        for (int i = 0; i < s.length() / 2; i++) {
+            if (s.charAt(i) != s.charAt(s.length() - i - 1)) {
+                return 0;
+            }
+        }
+        return 1;
+    }
 
-    static byte[] int_to_byte(int i) {
+
+    static byte[] intobyte(int i) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(i);
@@ -254,10 +320,10 @@ public class Client2 {
     }
 
     static byte[] make_pkt_hello(int i, String d) {
-        byte type[] = int_to_byte(i);
+        byte type[] = intobyte(i);
         byte data[] = Stringtobyte(d);
         int datalen = data.length;
-        byte len[] = int_to_byte(datalen);
+        byte len[] = intobyte(datalen);
         ByteBuffer final_array = ByteBuffer.allocate(datalen + 8);
         final_array.put(type);
         final_array.put(len);
