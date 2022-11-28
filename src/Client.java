@@ -269,9 +269,6 @@ public class Client {
                     out.write(before_send.array());
                 }
 
-
-
-
             }
 
             if (type == PKT_RESULT) {
