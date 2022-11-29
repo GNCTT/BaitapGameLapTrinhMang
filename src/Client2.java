@@ -111,7 +111,7 @@ public class Client2 {
                     HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
                     gameClient.setWidth(WIDTH_MAP_SIZE);
                     gameClient.setHeight(HEIGHT_MAP_SIZE);
-                    gameClient.createMap();
+                    gameClient.createMap(Game.getWidth(),Game.getHeight());
                     num_trap = bytetoINT(num_trap_byte);
                     System.out.println("num_trap: " + num_trap);
                     arr_trap = new int[num_trap][2];
@@ -129,10 +129,10 @@ public class Client2 {
                     x_location = 3;
                     y_location = 3;
 
-                    gameClient.nhapToaDo();
+                    gameClient.setupPlane();
                     x_location = gameClient.getX();
                     y_location = gameClient.getY();
-                    gameClient.chonHuongMayBay();
+//                    gameClient.chonHuongMayBay();
                     dir_plane = gameClient.getDir();
                     System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
 
@@ -216,7 +216,7 @@ public class Client2 {
                 break;
             }
             count++;
-            gameClient.renderMap();
+            gameClient.renderMap(Game.getWidth(),Game.getHeight());
         }
         out.close();
         in.close();

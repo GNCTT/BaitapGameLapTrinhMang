@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Server
+public class  Server
 {
     private Socket		 socket = null;
     private ArrayList<Socket> listSockets;
@@ -235,7 +235,7 @@ public class Server
                                 if (clientID == clientID_1) {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_2;
-                                    gameClient_1.a
+//                                    gameClient_1.a
                                 } else {
                                     ID_byte = inttobyte(clientID);
                                     clientID = clientID_1;

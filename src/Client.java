@@ -113,7 +113,7 @@ public class Client {
                     num_trap = bytetoINT(num_trap_byte);
                     gameClient.setWidth(WIDTH_MAP_SIZE);
                     gameClient.setHeight(HEIGHT_MAP_SIZE);
-                    gameClient.createMap();
+                    gameClient.createMap(Game.getWidth(),Game.getHeight());
                     System.out.println("num_trap: " + num_trap);
                     arr_trap = new int[num_trap][2];
                     for (int i = 0; i < num_trap; i++) {
@@ -124,7 +124,7 @@ public class Client {
                         System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
                     }
 //                    gameClient.addTrap(arr_trap);
-                    gameClient.renderMap();
+                    gameClient.renderMap(Game.getWidth(),Game.getHeight());
                     //them vi tri bay bang truyen 1 mang vao
                     System.out.println("end");
                     //nhan xong du lieu ben server
@@ -133,10 +133,10 @@ public class Client {
                     dir_plane = 1;
                     x_location = 3;
                     y_location = 3;
-                    gameClient.nhapToaDo();
+                    gameClient.setupPlane();
                     x_location = gameClient.getX();
                     y_location = gameClient.getY();
-                    gameClient.chonHuongMayBay();
+//                    gameClient.chonHuongMayBay();
                     dir_plane = gameClient.getDir();
                     System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
 //                    game.setPlane()
@@ -222,12 +222,12 @@ public class Client {
                 System.out.println("action: " + action);
 
                 if(action==1){
-                    gameClient.firer();
+//                    gameClient.firer();
                 }
 
                 // Di Chuyen
                 if(action==2){
-                    gameClient.move();
+//                    gameClient.move();
                 }
 
             }
@@ -235,7 +235,7 @@ public class Client {
                 break;
             }
             count++;
-            gameClient.renderMap();
+            gameClient.renderMap(Game.getWidth(),Game.getHeight());
         }
         out.close();
         in.close();
