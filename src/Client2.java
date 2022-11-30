@@ -143,7 +143,6 @@ public class Client2 {
                     dir_plane = 1;
                     x_location = 3;
                     y_location = 3;
-                    gameClient.nhapToaDo();
                     x_location = gameClient.getX();
                     y_location = gameClient.getY();
                     gameClient.chonHuongMayBay();
@@ -226,11 +225,10 @@ public class Client2 {
                 System.out.println("hello_from_213_client" + ID_RECEIVE + " " + clientID);
                 if (ID_RECEIVE == clientID) {
                     System.out.println("hello" + ID_RECEIVE);
-                    int action = gameClient.selection();
+                    int action = 1;
                     System.out.println("action: " + action);
                     int x_fire = 0, y_fire = 0;
                     if(action==2){
-                        gameClient.firer();
                         //getX_fire, Y_fire
                         x_fire = 1;
                         y_fire = 2;
@@ -238,7 +236,6 @@ public class Client2 {
 
                     // Di Chuyen
                     if(action==1){
-                        gameClient.move();
                         dir_plane = gameClient.getDir();
                     }
 

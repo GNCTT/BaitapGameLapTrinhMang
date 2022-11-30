@@ -142,8 +142,8 @@ public class Server
 //                    }
 //                }
 
-            gameClient_1 = new Game(1, 1);
-            gameClient_2 = new Game(1, 1);
+            gameClient_1 = new Game(20, 20);
+            gameClient_2 = new Game(20, 20);
             client_Check = 0;
             listSockets = new ArrayList<>();
             server = new ServerSocket(port);
@@ -158,9 +158,10 @@ public class Server
             is_win = false;
             count_time_client_1 = 0;
             count_time_client_2 = 0;
+            Random random = new Random();
             for (int i = 0; i < NUM_TRAP; i++) {
-                arr_trap[i][0] = i;
-                arr_trap[i][1] = 1;
+                arr_trap[i][0] = random.nextInt(15);
+                arr_trap[i][1] = random.nextInt(15);
             }
             System.out.println("Server started");
 
@@ -241,6 +242,10 @@ public class Server
                                     before_send.put(y_location_trap);
                                     System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
                                 }
+                                gameClient_1.addTrap(arr_trap);
+                                gameClient_2.addTrap(arr_trap);
+                                gameClient_1.setPlane(0, 0);
+                                gameClient_2.setPlane(0, 0);
                                 out.write(before_send.array());
 
                             }
@@ -258,7 +263,14 @@ public class Server
                             y_location = byte_int(y_location_byte);
                             //check vi tri dat may bay va check thong tin nguoi gui.
                             System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
-                            boolean checkSetPlane = true;
+                            System.out.println(x_location + "   ----   " + y_location);
+                            boolean checkSetPlane = false;
+                            if (clientID == clientID_1) {
+                                checkSetPlane = gameClient_1.checkLocationPlane(x_location, y_location);
+                            }
+                            if (clientID == clientID_2) {
+                                checkSetPlane = gameClient_2.checkLocationPlane(x_location, y_location);
+                            }
                             // checkplane method
 
                             if (checkSetPlane) {

@@ -2,154 +2,217 @@ package Start;
 
 import java.util.Scanner;
 
-import static Start.Function.*;
-import static Start.RotatePlane.updateHuong;
 //import static Start.RotatePlane.*;
 
 public class Game {
     static int [][] map;
-    static int[][] mayBay ={{0,0,2,0,0},       //          2
-            {0,2,0,0,2},       //         2  2
-            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-            {0,2,0,0,2},       //         2  2
-            {0,0,2,0,0}};
-    static int[][] mayBay1 ={{0,0,2,0,0},       //          2
-                            {0,2,0,0,2},       //         2  2
-                            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-                            {0,2,0,0,2},       //         2  2
-                            {0,0,2,0,0}};
+
+    private int[][] mayBay;
+    private int[][] mayBay1 ={{0,0,2,0,0},       //          2
+                             {0,2,0,0,2},       //         2  2
+                             {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                             {0,2,0,0,2},       //         2  2
+                             {0,0,2,0,0}};
     //          2
-    static int[][] mayBay2 ={{0,0,2,0,0},       //          2
-                            {0,2,0,2,0},       //         2  2
-                            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-                            {0,2,0,0,2},       //         2  2
-                            {0,0,2,0,0}};
-    static int[][] mayBay3 ={{0,0,2,0,0},       //          2
-            {0,2,0,0,2},       //         2  2
-            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-            {0,2,0,0,2},       //         2  2
-            {0,0,2,0,0}};
+    private int[][] mayBay2 ={{0,0,2,0,0},       //          2
+                             {0,2,2,2,0},       //         2  2
+                             {2,0,2,0,2},       //        22222      *Tam may bay o toa do [2;2]*
+                             {0,0,2,0,0},       //         2  2
+                             {2,2,2,2,2}};
+    private int[][] mayBay3 ={{2,0,2,0,0},       //          2
+                             {2,0,0,2,0},       //         2  2
+                             {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                             {2,0,0,2,0},       //         2  2
+                             {2,0,2,0,0}};
 
-    static int[][] mayBay4 ={{0,0,2,0,0},       //          2
-            {0,2,0,0,2},       //         2  2
-            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-            {0,2,0,0,2},       //         2  2
-            {0,0,2,0,0}};
+    private int[][] mayBay4 ={{2,2,2,2,2},       //          2
+                             {0,0,2,0,0},       //         2  2
+                             {2,0,2,0,2},       //        22222      *Tam may bay o toa do [2;2]*
+                             {0,2,0,2,0},       //         2  2
+                             {0,0,2,0,0}};
 
-    static int[][] trap;
+    private int [][] map_load;
+
+    private int[][] trap;
 
     static int width;   // Chieu rong map
     static int height;  // Chieu cao map
-    static int x;       //Toa do may bay
-    static int y;       //Toa do may bay
-    static int lastMove=4;
-    static int newMove=4;
-
-    public int dir;
+    private int x;
+    private int y;
 
     public int action;
 
     static int clientID;
 
+    private int x_plane;
+    private int y_plane;
+    public int dir;
 
-
-    public static void main(String[] args) {
-//        Scanner in= new Scanner(System.in);
-//        int N,M;
-//        M=in.nextInt();
-//        N=in.nextInt();
-
-        Game game= new Game(width,height);
-        game.setWidth(15);
-        game.setHeight(15);
-        game.start(game);
-
-    }
-
-
-    public void start(Game game){
-        createMap();
-        renderMap();
-        renderPlane();
-        nhapToaDo();
-        chonHuongMayBay();
-        renderMap();
-
-        System.out.println("------------------------------START---------------------------");
-        Scanner in= new Scanner(System.in);
-        boolean start=true;
-        while (start){
-            if(checkLose()==true){
-                System.out.println("------------------ĐÃ THUA-------------------");
-                break;
-            }
-            // chon 1: BAN  2:DI CHUYEN
-            int action= selection();
-            boolean check= true;
-            // Ban
-            if(action==1){
-                firer();
-            }
-
-            // Di Chuyen
-            if(action==2){
-                move();
-            }
-            renderMap();
-        }
-
-    }
-
-    public static void setLastMove(int lastMove) {
-        Game.lastMove = lastMove;
-    }
 
     public int getDir() {
         return dir;
     }
 
-    public static int getLastMove() {
-        return lastMove;
-    }
-
-    public static void setNewMove(int newMove) {
-        Game.newMove = newMove;
-    }
-
-    public static int getNewMove() {
-        return newMove;
-    }
-
-    public static int[][] getMayBay() {
-        return mayBay;
-    }
-
-    public static void setX(int x) {
-        Game.x = x;
+    public void setX(int x) {
+        this.x = x;
     }
 
     public int getX() {
         return this.x;
     }
 
-    public static int getY() {
+
+    public int getY() {
         return y;
     }
 
-    public static void setY(int y) {
-        Game.y = y;
+    public void setY(int y) {
+        this.y = y;
     }
 
     public Game(int width, int height){
         this.setWidth(width);
         this.setHeight(height);
+        map = new int[width][height];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                map[i][j] = 0;
+            }
+        }
+        map_load = new int[width][height];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                map_load[i][j] = 0;
+            }
+        }
+        mayBay = new int[5][5];
+        reloadPlane(mayBay2);
+        x_plane = 3;
+        y_plane = 3;
     }
+
+    public boolean checkLocationPlane(int x_plane, int y_plane) {
+        if (x_plane - mayBay.length / 2 < 0 || x_plane >= map.length - mayBay.length / 2 || y_plane < mayBay.length / 2 || y_plane >= map.length - mayBay.length / 2) {
+            return false;
+        } else {
+            int start_x = x_plane - mayBay.length / 2;
+            int start_y = y_plane - mayBay.length / 2;
+            for (int i = start_y; i < mayBay.length + start_y; i++) {
+                for (int j = start_x; j < mayBay.length + start_x; j++) {
+                    if (mayBay[i - start_y][j - start_x] != 0) {
+                        int check = map[i][j] + mayBay[i - start_y][j - start_x];
+                        System.out.println(check);
+                        if (check > 20) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public void reloadMap() {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                map[i][j] = map_load[i][j];
+            }
+        }
+    }
+
+    public int[][] getMap() {
+        return this.map;
+    }
+    public void setPlane(int x_plane, int y_plane) {
+        reloadMap();
+        if (checkLocationPlane(x_plane, y_plane)) {
+            int start_x = x_plane - mayBay.length / 2;
+            int start_y = y_plane - mayBay.length / 2;
+            for (int i = start_y; i < mayBay.length + start_y; i++) {
+                for (int j = start_x; j < mayBay.length + start_x; j++) {
+                    if (mayBay[i - start_y][j - start_x] != 0) {
+                        map[i][j] = mayBay[i - start_y][j - start_x];
+                    }
+                }
+            }
+            this.x_plane = x_plane;
+            this.y_plane = y_plane;
+        }
+    }
+
+    public void reloadPlane(int [][] newPlane) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                mayBay[i][j] = newPlane[i][j];
+            }
+        }
+    }
+
+
+    public void move(int dir) {
+        switch (dir) {
+            case 0:
+                if (checkLocationPlane(x_plane -1, y_plane)) {
+                    x_plane -= 1;
+                }
+                break;
+            case 1:
+                if (checkLocationPlane(x_plane, y_plane - 1)) {
+                    y_plane -= 1;
+                }
+                break;
+            case 2:
+                if (checkLocationPlane(x_plane + 1, y_plane)) {
+                    x_plane += 1;
+                }
+                break;
+            default:
+                if (checkLocationPlane(x_plane, y_plane + 1)) {
+                    y_plane += 1;
+                }
+        }
+        setPlane(x_plane, y_plane);
+    }
+
+
+
+    public void addTrap(int [][] arr_trap) {
+        for (int i = 0; i < arr_trap.length; i++) {
+            map_load[arr_trap[i][0]][arr_trap[i][1]] = 20;
+        }
+    }
+
+    public boolean checkShoot(int x, int y) {
+        if (map[x][y] == 2) {
+            return true;
+        }
+        return false;
+    }
+    public void beShoot(int x, int y) {
+        int startX = x_plane - mayBay.length / 2;
+        int startY = y_plane - mayBay.length / 2;
+        mayBay[x - startX][y - startY] = 0;
+    }
+
+    public void render() {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map.length; j++) {
+                if (map[i][j] == 0) {
+                    System.out.print(". ");
+                }
+                if (map[i][j] == 2) {
+                    System.out.print("* ");
+                }
+                if (map[i][j] == 20) {
+                    System.out.print("# ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
 
     public Game(){
         action = -1;
-    }
-    public static int[][] getMap() {
-        return map;
     }
     public static int getHeight() {
         return height;
@@ -243,13 +306,6 @@ public class Game {
         }
     }
 
-    public boolean checkSetPlane(int x, int y, int dir) {
-
-        return true;
-    }
-    public void setPlane(int x, int y, int dir) {
-
-    }
 
     public void chonHuongMayBay(){
         Scanner in= new Scanner(System.in);
@@ -259,9 +315,6 @@ public class Game {
             System.out.print("Nhap Huong ( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
             int move= in.nextInt();
             if(move>=1 && move<=4){
-                setNewMove(move);
-                updateHuong(getNewMove(),getLastMove());
-                updateDiChuyen(map,mayBay,x,y);
                 check=false;
                 dir = move;
             }else{
@@ -271,157 +324,7 @@ public class Game {
         }
     }
 
-    public void nhapToaDo(){
-        Scanner in= new Scanner(System.in);
-        System.out.println("---------------------TOA DO-----------------------");
-        //Dat may bay
-        //Chon vi tri dat
-        System.out.println("Nhap toa do dat may bay !!");
-        System.out.print("Nhap toa do x: ");
-        int x= in.nextInt();
-        System.out.print("Nhap toa do y: ");
-        int y=in.nextInt();
-        System.out.println("Toa do: ["+ x +":"+ y +"]");
 
-        boolean checkToaDoFalse=true;
-        while (checkToaDoFalse){
-            if(checkDiChuyen(map,mayBay,x,y)==false){
-                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!!");
-                System.out.print("Nhap toa do x: ");
-                x=in.nextInt();
-                System.out.print("Nhap toa do y: ");
-                y=in.nextInt();
-                System.out.println("Toa do: ["+ x +":"+ y +"]");
-            }else{
-                setX(x);
-                setY(y);
-                updateDiChuyen(map,mayBay,x,y);
-                checkToaDoFalse=false;
-            }
-        }
-    }
-
-    public int selection(){
-        Scanner in= new Scanner(System.in);
-        System.out.println("-------------------------LUA CHON--------------------------");
-        System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
-        System.out.print("Bạn Chọn: ");
-        int action= 0;
-        boolean check= true;
-        action= in.nextInt();
-        while (check){
-            if(action<1 || action>2){
-                System.out.println("Lựa chọn không hợp lệ!!! Vui long chọn lại");
-                System.out.println("-------------------------LUA CHON--------------------------");
-                System.out.println("Chọn số 1:BẮN hoặc 2:DI CHUYỂN");
-                System.out.print("Bạn Chọn: ");
-                action= in.nextInt();
-            }else {
-                System.out.println("Bạn đã chọn số: "+ action);
-                if(action==1){
-                    return action;
-                }else {
-                    if(checkDiChuyen(map,mayBay,x-1,y)==false &&
-                            checkDiChuyen(map,mayBay,x+1,y)==false &&
-                            checkDiChuyen(map,mayBay,x,y-1)==false &&
-                            checkDiChuyen(map,mayBay,x,y+1)==false ){
-                        System.out.println("Bạn Không Thể Di Chuyển !! Chỉ Có Thể Bắn !!");
-                        return 1;
-                    }else {
-                        return action;
-                    }
-                }
-            }
-        }
-        return action;
-    }
-
-    public void firer(){
-        Scanner in= new Scanner(System.in);
-        System.out.println("-------------------------BAN--------------------------");
-        System.out.print("Nhap toa do x can ban: ");
-        int j=in.nextInt();
-        System.out.print("Nhap toa do y can ban: ");
-        int i=in.nextInt();
-        System.out.println("Toa do ban: ["+ j +":"+ i +"]");
-        boolean check=true;
-        while (check){
-            if(i<0 || i>=getHeight() || j<0 || j>=getWidth()){
-                System.out.println("Toa Do Khong Hop Le !! Vui Long Nhap Lai !!");
-                System.out.println("-------------------------BAN--------------------------");
-                System.out.print("Nhap toa do x can ban: ");
-                j=in.nextInt();
-                System.out.print("Nhap toa do y can ban: ");
-                i=in.nextInt();
-                System.out.println("Toa do ban: ["+ j +":"+ i +"]");
-            }else {
-                System.out.println("Toa Do Ban la : [" + j + ":" + i +"]");
-                if(map[i][j]==2){
-                    mayBay[2-y+i][2-x+j]=3;
-                    updateDiChuyen(map,mayBay,x,y);
-                } else if (map[i][j]==0) {
-                    map[i][j]=4;
-                }
-                check=false;
-            }
-        }
-    }
-
-    public void move(){
-        // 1: Len, 2: Phai, 3: Xuong, 4: Trai
-        Scanner in= new Scanner(System.in);
-        boolean check=true;
-        while (check){
-            System.out.println("-------------------------MOVE--------------------------");
-            System.out.print("Nhap Huong Di Chuyen( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
-            int move= in.nextInt();
-            if(move==1){
-                //Di Chuyen Len
-                if(checkDiChuyen(map,mayBay,x,y-1)==false){
-                    System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
-                    y--;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
-                    break;
-                }
-            }else if(move==2){
-                //Di Chuyen Phai
-                if(checkDiChuyen(map,mayBay,x+1,y)==false){
-                    System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
-                    x++;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
-                    break;
-                }
-            }else if(move==3){
-                //Di Chuyen Xuong
-                if(checkDiChuyen(map,mayBay,x,y+1)==false){
-                    System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
-                    y++;
-                    updateHuong(getNewMove(),getLastMove());
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
-                    break;
-                }
-            } else if(move==4) {
-                //Di Chuyen Trai
-                if(checkDiChuyen(map,mayBay,x-1,y)==false){
-                    System.out.println("Di Chuyen Khong Hop Le !! Vui Long Nhap Lai !!!");
-                }else{
-                    x--;
-                    updateDiChuyen(map,mayBay,x,y);
-                    check=false;
-                    break;
-                }
-            }else{
-                //Khong Hop Le
-                System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
-            }
-        }
-    }
 
 }
 
