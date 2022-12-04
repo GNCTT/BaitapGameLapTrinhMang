@@ -1,5 +1,6 @@
 
 import Start.Game;
+import Start.GameOther;
 import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import java.io.*;
@@ -75,24 +76,45 @@ public class Client {
     private boolean checkQuitServer;
     private boolean canMove;
 
-    private static Game gameClient;
+    private int status;
+
+    public boolean has_change;
+    private Game gameClient;
+    private GameOther gameOther;
+
     private DataOutputStream outs;
     private DataInputStream ins;
     private Socket clientSocket;
 
-    public Client(String host, int port) {
+    public boolean checkMessage;
+    public boolean be_send;
+
+    public boolean is_over;
+
+    private int result_match;
+    private byte result_byte[];
+
+    public Client(String host, int port, Game gameClient, GameOther gameOther) {
+        this.gameClient = gameClient;
+        this.gameOther = gameOther;
         checkSetPlane = false;
+        is_over = false;
         checkQuitServer = false;
+        be_send = false;
         ID_receive = 0;
         canMove = false;
+        checkMessage = true;
+        status = 0;
+        has_change = true;
         try {
             clientSocket = new Socket(host, port);
             ins = new DataInputStream(clientSocket.getInputStream());
             outs = new DataOutputStream(clientSocket.getOutputStream());
-            System.out.print("Nhap ma sv:");
-            Scanner sc = new Scanner(System.in);
-            msv = sc.nextLine();
-            byte[] pkt = make_pkt_hello(0, msv);
+            status = 0;
+            msv = "234";
+//            System.out.print("Nhap ma sv:");
+//            Scanner sc = new Scanner(System.in);
+//            msv = sc.nextLine();
             type_byte = intobyte(0);
             data_byte = Stringtobyte(msv);
             data_length = data_byte.length;
@@ -104,45 +126,100 @@ public class Client {
         }
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void readDataFromServer() {
         buffer = new byte[5000];
         try {
             ins.read(buffer);
-            type_byte = getBytebyIndex(buffer, 0, 4);
-            int type = bytetoINT(type_byte);
-            System.out.println("type: " + type);
-            if (type == BYE_PKT_TYPE) {
-                checkQuitServer = true;
-            }
-            if (type == TURN_PKT_TYPE) {
+            if (buffer != null) {
+                has_change = true;
+                checkMessage = true;
+                type_byte = getBytebyIndex(buffer, 0, 4);
                 ID_byte = getBytebyIndex(buffer, 8, 12);
-                ID_receive = bytetoINT(ID_byte);
-                System.out.println("ID: " + ID_receive);
-                canMove = true;
-            }
-            if (type == PKT_RESULT) {
-                ID_byte = getBytebyIndex(buffer, 8, 12);
-                int ID_receive = bytetoINT(ID_byte);
-                if (ID_receive == clientID) {
-                    //show RESULT
-                    byte result_byte[];
-                    result_byte = getBytebyIndex(buffer, 12, 16);
-                    int result = bytetoINT(result_byte);
-                    System.out.println("result: " + result);
-                    if (result == 3) {
-
+                int id_receive = bytetoINT(ID_byte);
+                ID_receive = id_receive;
+                System.out.println("fasd: " + id_receive + " " + be_send);
+                    int type = bytetoINT(type_byte);
+                    System.out.println("type: " + type);
+                    be_send = true;
+                    if (type == BYE_PKT_TYPE) {
+                        checkQuitServer = true;
+                        status = 3;
                     }
-                }
+                    if (type == TURN_PKT_TYPE) {
+                        ID_byte = getBytebyIndex(buffer, 8, 12);
+                        ID_receive = bytetoINT(ID_byte);
+                        System.out.println("ID: " + ID_receive);
+                        canMove = true;
+                        status = 1;
+                        has_change = true;
+                    }
+                    if (type == PKT_RESULT) {
+                        ID_byte = getBytebyIndex(buffer, 8, 12);
+                        int ID_receive_ = bytetoINT(ID_byte);
+                        ID_receive = ID_receive_ + 1;
+
+                        if (ID_receive_ == clientID) {
+                            //show RESULT
+                            byte result_byte[];
+                            status = 4;
+                            result_byte = getBytebyIndex(buffer, 12, 16);
+                            int result = bytetoINT(result_byte);
+                            System.out.println("result: " + result);
+                            if (result == 0) {
+                                System.out.println("miss");
+                            }
+                            if (result == 1) {
+                                System.out.println("good");
+                            }
+                            if (result == 4) {
+                                System.out.println("continue");
+                            }
+                        }
+                    }
+                    if (type == 8) {
+                        x_location_byte = getBytebyIndex(buffer, 12, 16);
+                        y_location_byte = getBytebyIndex(buffer, 16, 20);
+                        int x_ = bytetoINT(x_location_byte);
+                        int y_ = bytetoINT(y_location_byte);
+                        System.out.println("shoot: " + x_ + y_);
+                        gameClient.checkShoot(x_, y_);
+                        gameClient.beShoot(x_, y_);
+                        gameClient.render();
+                        has_change = true;
+                    }
+                    if (type == PKT_END) {
+                        System.out.println("receive Res");
+                        result_byte = getBytebyIndex(buffer, 12, 16);
+                        is_over = true;
+                        result_match = bytetoINT(result_byte);
+                        System.out.println(result_match);
+                    }
+
+            } else {
+                checkMessage = false;
+                be_send = false;
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            }
 
+    }
+
+    public int getResultMatch() {
+        return result_match;
     }
 
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
+    }
+
+    public void setID_receive(int id_receive) {
+        this.ID_receive = id_receive;
     }
 
     public boolean isCanMove() {
@@ -157,9 +234,18 @@ public class Client {
 
     }
 
+    public boolean isCheckMessage() {
+        return checkMessage;
+    }
+
+    public void setStatus(int _status) {
+        this.status = _status;
+    }
+
     public int[][] getArr_trap() {
         buffer = new byte[5000];
         try {
+            has_change = true;
             ins.read(buffer);
             byte[] len = getBytebyIndex(buffer, 12, 16);
             int size_data = bytetoINT(len);
@@ -193,6 +279,46 @@ public class Client {
         return arr_trap;
     }
 
+    public void getArr_Trap() {
+        buffer = new byte[5000];
+        try {
+            has_change = true;
+            ins.read(buffer);
+            byte[] len = getBytebyIndex(buffer, 12, 16);
+            int size_data = bytetoINT(len);
+            System.out.println(size_data);
+            ID_byte = getBytebyIndex(buffer, 16, 20);
+            width_map_byte = getBytebyIndex(buffer, 20, 24);
+            height_map_byte = getBytebyIndex(buffer, 24, 28);
+            width_map = bytetoINT(width_map_byte);
+            height_map = bytetoINT(height_map_byte);
+            System.out.println(width_map + " " + height_map);
+            num_trap_byte = getBytebyIndex(buffer, 28, 32);
+            clientID = bytetoINT(ID_byte);
+            WIDTH_MAP_SIZE = bytetoINT(width_map_byte);
+            HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
+            gameClient.reload(WIDTH_MAP_SIZE, HEIGHT_MAP_SIZE);
+            gameOther.reload(WIDTH_MAP_SIZE, HEIGHT_MAP_SIZE);
+            num_trap = bytetoINT(num_trap_byte);
+            System.out.println("num_trap: " + num_trap);
+            arr_trap = new int[num_trap][2];
+            for (int i = 0; i < num_trap; i++) {
+                x_trap_byte = getBytebyIndex(buffer, 32 + i * 8, 36 + i * 8);
+                y_trap_byte = getBytebyIndex(buffer, 36 + i * 8, 40 + i * 8);
+                arr_trap[i][0] = bytetoINT(x_trap_byte);
+                arr_trap[i][1] = bytetoINT(y_trap_byte);
+                System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
+            }
+            gameClient.addTrap(arr_trap);
+            gameOther.add_trap(arr_trap);
+
+            System.out.println("end");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public int getHeight_map() {
         return height_map;
     }
@@ -210,14 +336,19 @@ public class Client {
     }
 
     public void sendSetPlanePkt(int dir, int x_location, int y_location) {
+        has_change = true;
+        status = 2;
         ByteBuffer before_send = ByteBuffer.allocate(24);
         type_byte = intobyte(SET_PLANE_PKT);
         len_byte = intobyte(16);
         System.out.println("---------id " + clientID);
         ID_byte = intobyte(clientID);
-        dir_byte = intobyte(dir_plane);
+        dir_byte = intobyte(dir);
         x_location_byte = intobyte(x_location);
         y_location_byte = intobyte(y_location);
+        if (gameClient.checkLocationPlane(x_location, y_location)) {
+            gameClient.setPlane(dir, x_location, y_location);
+        }
         before_send.put(type_byte);
         before_send.put(len_byte);
         before_send.put(ID_byte);
@@ -229,20 +360,26 @@ public class Client {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    public void sendPktPlay(int K, int dir, int x_fire, int y_fire) {
+    public void sendPktPlay(int dir,int t, int x_location, int y_location) {
+
+    }
+
+    public void sendPktPlay(int K, int x_fire, int y_fire) {
+        try {
+            has_change = true;
         type_byte = intobyte(PLAY_PKT_TYPE);
         len_byte = intobyte(4 * (2 + K));
         ID_byte = intobyte(clientID);
         command_byte = intobyte(K);
-
         ByteBuffer before_send = ByteBuffer.allocate(8 + 4 *(2 + K));
         before_send.put(type_byte);
         before_send.put(len_byte);
         before_send.put(ID_byte);
         before_send.put(command_byte);
-
+        System.out.println("sendPktPlay");
         if (K == 1) {
             dir_byte = intobyte(dir_plane);
             before_send.put(dir_byte);
@@ -252,256 +389,34 @@ public class Client {
             before_send.put(x_fire_byte);
             before_send.put(y_fire_byte);
         }
-
-        try {
             outs.write(before_send.array());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    public static void main(String[] args) throws Exception {
-        gameClient = new Game(1, 1);
-        Scanner sc = new Scanner(System.in);
-//        GameClient gameClient = new GameClient();
-//
-//        gameClient.createMap(20, 20);
-
-        Socket clientsocket = new Socket("127.0.0.1", 8080);
-        DataInputStream in = new DataInputStream(clientsocket.getInputStream());
-        DataOutputStream out = new DataOutputStream(clientsocket.getOutputStream());
-        System.out.print("Nhap ma sv:");
-        msv = sc.nextLine();
-        byte[] pkt = make_pkt_hello(0, msv);
-        type_byte = intobyte(0);
-        data_byte = Stringtobyte(msv);
-        data_length = data_byte.length;
-        len_byte = intobyte(data_length);
-        pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
-        out.write(pkt_sent);
-        int count = 0;
-        while (true) {
-            buffer = new byte[50000];
-            type_byte = new byte[4];
-            in.read(buffer);
-            if (count == 0) {
-                type_byte = getBytebyIndex(buffer, 8, 12);
-
-                System.out.println("Helloooo: " + bytetoINT(type_byte) );
-            }
-            if (count != 0) {
-                type_byte = getBytebyIndex(buffer, 0, 4);
-            }
-            int type = bytetoINT(type_byte);
-            System.out.println("type: " + type);
-            if (type == BYE_PKT_TYPE) {
-                System.out.println("???");
-                break;
-            }
-            if (type == CREATE_MAP_PKT || type == 5) {
-                if (count == 0) {
-                    byte[] len = getBytebyIndex(buffer, 12, 16);
-                    int size_data = bytetoINT(len);
-                    System.out.println(size_data);
-                    ID_byte = getBytebyIndex(buffer, 16, 20);
-                    width_map_byte = getBytebyIndex(buffer, 20, 24);
-                    height_map_byte = getBytebyIndex(buffer, 24, 28);
-                    System.out.println(bytetoINT(width_map_byte) + " " + bytetoINT(height_map_byte));
-                    num_trap_byte = getBytebyIndex(buffer, 28, 32);
-//                    clientID = bytetoINT(ID_byte);
-                    WIDTH_MAP_SIZE = bytetoINT(width_map_byte);
-                    HEIGHT_MAP_SIZE = bytetoINT(height_map_byte);
-                    num_trap = bytetoINT(num_trap_byte);
-                    gameClient.setWidth(WIDTH_MAP_SIZE);
-                    gameClient.setHeight(HEIGHT_MAP_SIZE);
-                    gameClient.createMap();
-                    System.out.println("num_trap: " + num_trap);
-                    arr_trap = new int[num_trap][2];
-                    for (int i = 0; i < num_trap; i++) {
-                        x_trap_byte = getBytebyIndex(buffer, 32 + i * 8, 36 + i * 8);
-                        y_trap_byte = getBytebyIndex(buffer, 36 + i * 8, 40 + i * 8);
-                        arr_trap[i][0] = bytetoINT(x_trap_byte);
-                        arr_trap[i][1] = bytetoINT(y_trap_byte);
-                        System.out.println(arr_trap[i][0] + " " + arr_trap[i][1]);
-                    }
-//                    gameClient.addTrap(arr_trap);
-                    gameClient.renderMap();
-                    //them vi tri bay bang truyen 1 mang vao
-                    System.out.println("end");
-                    //nhan xong du lieu ben server
-                    //render map plane, bay, chon vi tri may bay, huong
-//                    game.nhapSetPlane()
-                    dir_plane = 1;
-                    x_location = 3;
-                    y_location = 3;
-                    x_location = gameClient.getX();
-                    y_location = gameClient.getY();
-                    gameClient.chonHuongMayBay();
-                    dir_plane = gameClient.getDir();
-                    System.out.println(x_location + " " + y_location + " " + dir_plane + " ----");
-//                    game.setPlane()
-
-                    ByteBuffer before_send = ByteBuffer.allocate(24);
-                    type_byte = intobyte(SET_PLANE_PKT);
-                    len_byte = intobyte(16);
-//                    System.out.println("---------id " + clientID);
-//                    ID_byte = intobyte(clientID);
-                    dir_byte = intobyte(dir_plane);
-                    x_location_byte = intobyte(x_location);
-                    y_location_byte = intobyte(y_location);
-                    before_send.put(type_byte);
-                    before_send.put(len_byte);
-                    before_send.put(ID_byte);
-                    before_send.put(dir_byte);
-                    before_send.put(x_location_byte);
-                    before_send.put(y_location_byte);
-                    out.write(before_send.array());
-                }
-                if (count != 0) {
-                    byte[] len = getBytebyIndex(buffer, 4, 8);
-                    int size_data = bytetoINT(len);
-                    datax = getBytebyIndex(buffer, 8, 12);
-                    dataN = getBytebyIndex(buffer, 12, 16);
-                    dataM = getBytebyIndex(buffer, 16, 20);
-                    int x = bytetoINT(datax);
-                    int N = bytetoINT(dataN);
-                    int M = bytetoINT(dataM);
-                    dataArrElement = new byte[4];
-                    int [][] arrdata = new int[M][N];
-                    int index = 20;
-                    int resultx = -1;
-                    int resulty = -1;
-                    for (int i = 0; i < M; i++) {
-                        for (int j = 0; j < N; j++) {
-                            dataArrElement = getBytebyIndex(buffer, index, index + 4);
-                            arrdata[i][j] = bytetoINT(dataArrElement);
-                            if (arrdata[i][j] == x) {
-                                resultx = i;
-                                resulty = j;
-                            }
-                            index += 4;
-                        }
-                    }
-                    System.out.println("Hello " + x + " " + N + " " + M);
-                    for (int i = 0; i < M; i++) {
-                        for (int j = 0; j < N; j++) {
-                            System.out.print(arrdata[i][j] + " ");
-                        }
-                        System.out.println();
-                    }
-
-//                    System.out.println("result is " + result);
-                    int result = 0;
-                    type_byte = intobyte(2);
-                    len_byte = intobyte(8);
-//                    if (resultx != -1) {
-//                        resultx += 1;
-//                        resulty += 1;
-//                    }
-                    data_byte1 = intobyte(resultx);
-                    data_byte2 = intobyte(resulty);
-                    System.out.println("resultx: " + resultx + " resulty: " + resulty);
-                    data_byte = make_pkt_data(data_byte1, data_byte2);
-                    pkt_sent = make_pkt_send(type_byte, len_byte, data_byte);
-                    out.write(pkt_sent);
-                }
-
-            }
-
-            if (type == TURN_PKT_TYPE) {
-                byte[] len = getBytebyIndex(buffer, 4, 8);
-                int datasize = bytetoINT(len);
-                ID_byte = getBytebyIndex(buffer, 8, 8 + datasize);
-                int ID_RECEIVE = bytetoINT(ID_byte);
-//                System.out.println("hello_from_213_client" + ID_RECEIVE + " " + clientID);
-                if (ID_RECEIVE == 1) {
-                    System.out.println("hello" + ID_RECEIVE);
-                    int action = 2;
-                    System.out.println("action: " + action);
-                    int x_fire = 0, y_fire = 0;
-
-                    if(action==2){
-                        //getX_fire, Y_fire
-                        x_fire = 1;
-                        y_fire = 2;
-                    }
-
-                    // Di Chuyen
-                    if(action==1){
-                        dir_plane = gameClient.getDir();
-                    }
-
-                    int K = action;
-
-                    //send packet play
-                    type_byte = intobyte(PLAY_PKT_TYPE);
-                    len_byte = intobyte(4 * (2 + K));
-                    ID_byte = intobyte(1);
-                    command_byte = intobyte(K);
-
-                    ByteBuffer before_send = ByteBuffer.allocate(8 + 4 *(2 + K));
-                    before_send.put(type_byte);
-                    before_send.put(len_byte);
-                    before_send.put(ID_byte);
-                    before_send.put(command_byte);
-
-                    if (K == 1) {
-                        dir_byte = intobyte(dir_plane);
-                        before_send.put(dir_byte);
-                    } else {
-                        x_fire_byte = intobyte(x_fire);
-                        y_fire_byte = intobyte(y_fire);
-                        before_send.put(x_fire_byte);
-                        before_send.put(y_fire_byte);
-                    }
-
-                    out.write(before_send.array());
-                }
-
-            }
-
-            if (type == PKT_RESULT) {
-                ID_byte = getBytebyIndex(buffer, 8, 12);
-                int ID_receive = bytetoINT(ID_byte);
-                if (ID_receive == 1) {
-                    //show RESULT
-                    byte result_byte[];
-                    result_byte = getBytebyIndex(buffer, 12, 16);
-                    int result = bytetoINT(result_byte);
-                    System.out.println("result: " + result);
-                }
-            }
-            if (type == PKT_END) {
-                ID_byte = getBytebyIndex(buffer, 8, 12);
-                int ID_receive = bytetoINT(ID_byte);
-                if (ID_receive == 1) {
-                    byte result_match_byte[];
-                    result_match_byte = getBytebyIndex(buffer, 12, 16);
-                    int result_match = bytetoINT(result_match_byte);
-                    switch (result_match) {
-                        case 0:
-                            System.out.println("you lose");
-                            break;
-                        case 1:
-                            System.out.println("draw");
-                            break;
-                        case 2:
-                            System.out.println("you win");
-                            break;
-                    }
-                }
-            }
-            if (type == 10) {
-                break;
-            }
-            count++;
-            gameClient.renderMap();
+    public void sendPktPlay(int K, int dir) {
+        try {
+            has_change = true;
+            type_byte = intobyte(PLAY_PKT_TYPE);
+            len_byte = intobyte(4 * (2 + K));
+            ID_byte = intobyte(clientID);
+            dir_byte = intobyte(dir);
+            command_byte = intobyte(K);
+            ByteBuffer before_send = ByteBuffer.allocate(8 + 4 *(2 + K));
+            before_send.put(type_byte);
+            before_send.put(len_byte);
+            before_send.put(ID_byte);
+            before_send.put(command_byte);
+            before_send.put(dir_byte);
+            gameClient.move(dir);
+            System.out.println("sendPktPlay");
+            outs.write(before_send.array());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        out.close();
-        in.close();
-        clientsocket.close();
     }
+
 
 
     static int bytetoINT(byte[] bytes) {

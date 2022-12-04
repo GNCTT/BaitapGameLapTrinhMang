@@ -7,13 +7,14 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class GamePlayClient2 extends Application {
+public class GameClient1_2 extends Application {
 
     private Game game;
     private GameOther gameOther;
@@ -54,6 +55,25 @@ public class GamePlayClient2 extends Application {
         Scanner scanner = new Scanner(System.in);
 
         status = 0;
+        threadPool2.execute(()-> {
+
+            while (true) {
+                if (client.has_change) {
+                    render();
+                    client.has_change = false;
+                    if (client.is_over) {
+                        renderOver();
+                    }
+
+                }
+                client.readDataFromServer();
+                if (client.is_over) {
+                    renderOver();
+                }
+                System.out.println("client rcv: " + client.getID_receive());
+
+            }
+        });
 
         threadPool.execute(()-> {
             while (true) {
@@ -74,26 +94,26 @@ public class GamePlayClient2 extends Application {
                         dir = scanner.nextInt();
                         x_ = scanner.nextInt();
                         y_ = scanner.nextInt();
-                        if (game.checkLocationPlane(x_, y_)) {
+                        if (game.checkLocationPlane(dir, x_, y_)) {
                             loop = false;
                         }
 
-
                     }
                     client.sendSetPlanePkt(dir, x_, y_);
-                    render();
+                    client.setID_receive(0);
+//                    render();
 //                    client.readDataFromServer();
 
 
                     status = 1;
 
                 }
-                if (status == 1) {
-                    client.readDataFromServer();
-                    if (client.has_change) {
-                        render();
-                        client.has_change = false;
-                    }
+                if (status == 1 && !client.is_over) {
+//                    client.readDataFromServer();
+//                    if (client.has_change) {
+//                        render();
+//                        client.has_change = false;
+//                    }
                     System.out.print("nhap 1 de di chuyen 2 de ban: ");
                     int command = scanner.nextInt();
                     System.out.println();
@@ -101,6 +121,7 @@ public class GamePlayClient2 extends Application {
                         System.out.print("chon huong(0 sang trai, 1 len tren, 2 sang phai, 3 xuong duoi): ");
                         int dir = scanner.nextInt();
                         client.sendPktPlay(command, dir);
+                        client.setID_receive(0);
                         render();
 //                        client.readDataFromServer();
 
@@ -110,27 +131,18 @@ public class GamePlayClient2 extends Application {
                         int x_ = scanner.nextInt();
                         int y_ = scanner.nextInt();
                         client.sendPktPlay(command, x_, y_);
+                        client.setID_receive(0);
                         render();
 //                        client.readDataFromServer();
                     }
 
-                    System.out.println("IDrcv: " + client.getID_receive());
 
                 }
 
             }
         });
 
-        threadPool2.execute(()-> {
 
-            while (true) {
-//                client.readDataFromServer();
-                if (client.has_change) {
-                    render();
-                    client.has_change = false;
-                }
-            }
-        });
 
 
     }
@@ -160,5 +172,19 @@ public class GamePlayClient2 extends Application {
 
     public void renderMapOther() {
         gameOther.renderGame(gc, game.getMap().length * WIDTH_DEFAULT + 200, 0);
+    }
+
+    public void renderOver() {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setFont(new Font(40));
+        if (client.getResultMatch() == 1) {
+            gc.fillText(" DRAW ", 400, 400);
+        }
+        if (client.getResultMatch() == 0) {
+            gc.fillText(" LOSE ", 400, 400);
+        }
+        if (client.getResultMatch() == 2) {
+            gc.fillText(" WIN ", 400, 400);
+        }
     }
 }

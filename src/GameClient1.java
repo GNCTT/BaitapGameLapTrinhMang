@@ -13,7 +13,7 @@ import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class GamePlayClient2 extends Application {
+public class GameClient1 extends Application {
 
     private Game game;
     private GameOther gameOther;
@@ -32,7 +32,6 @@ public class GamePlayClient2 extends Application {
     private int status;
 
     Executor threadPool = Executors.newFixedThreadPool(5);
-    Executor threadPool2 = Executors.newFixedThreadPool(5);
     @Override
     public void start(Stage primaryStage) throws Exception {
         //init
@@ -59,10 +58,10 @@ public class GamePlayClient2 extends Application {
             while (true) {
 
                 update();
-//                if (client.has_change) {
-//                    render();
-//                    client.has_change = false;
-//                }
+                if (client.has_change) {
+                    render();
+                    client.has_change = false;
+                }
                 if (status == 0) {
                     boolean loop = true;
                     int dir = 0;
@@ -91,6 +90,7 @@ public class GamePlayClient2 extends Application {
                 if (status == 1) {
                     client.readDataFromServer();
                     if (client.has_change) {
+                        System.out.println("hello");
                         render();
                         client.has_change = false;
                     }
@@ -120,19 +120,6 @@ public class GamePlayClient2 extends Application {
 
             }
         });
-
-        threadPool2.execute(()-> {
-
-            while (true) {
-//                client.readDataFromServer();
-                if (client.has_change) {
-                    render();
-                    client.has_change = false;
-                }
-            }
-        });
-
-
     }
 
     public void update() {
