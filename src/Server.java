@@ -1,4 +1,5 @@
 import Start.Game;
+import org.json.JSONObject;
 
 import java.net.*;
 import java.io.*;
@@ -18,6 +19,13 @@ public class Server
     private ArrayList<DataOutputStream> outs;
     private DataInputStream in;
     private DataOutputStream out;
+
+    private DataInputStream in_server_game;
+    private DataOutputStream out_server_game;
+
+    private WebsocketClientEndpoint out_server_ws;
+
+    private int match_id;
 
     private final int HELLO_PKT_TYPE = 0;
     private final int PKT_CREATE_MAP = 1;
@@ -102,12 +110,16 @@ public class Server
 
     private boolean client1_send;
     private boolean client2_send;
+    private Socket clientTest;
+
 
 
     private final static int WIDTH_MAP = 20;
     private final static int HEIGHT_MAP = 20;
 
+
     private int client_first;
+
 
     private int result_match;
 
@@ -120,13 +132,27 @@ public class Server
     public Server(int port, int clientID_1, int clientID_2, Game gameClient_1, Game gameClient_2) {
         try {
             server = new ServerSocket(port);
+            System.out.println("waiting server game....");
+            socket = server.accept();
+            in_server_game = new DataInputStream(socket.getInputStream());
+            out_server_game = new DataOutputStream(socket.getOutputStream());
+            byte[] pkt_from_server = new byte[5000];
+            in_server_game.read(pkt_from_server);
+            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
+            System.out.println("???");
+            String res_from_server_game = byteToString(type_byte);
+            match_id = getMatchId(res_from_server_game);
+            System.out.println("matchId: " + match_id);
+            System.out.println("data: " + byteToString(type_byte));
+            JSONObject jsonObject = makeJson_start();
+            out_server_game.write(jsonObject.toString().getBytes());
             client_first = clientID_2;
             this.clientID_1 = clientID_1;
             this.clientID_2 = clientID_2;
             this.gameClient_1 = gameClient_1;
             this.gameClient_2 = gameClient_2;
-            count_time_client_1 = 1;
-            count_time_client_2 = 1;
+            count_time_client_1 = 10;
+            count_time_client_2 = 10;
             Random random = new Random();
             result_match = -1;
             has_change = true;
@@ -157,14 +183,37 @@ public class Server
             }
             System.out.println("Client accepted");
 
+            JSONObject jsonObject1 = makeJson_match(match_id, 2, 100, 0);
+//            out_server_game.write(jsonObject1.toString().getBytes());
+            out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
+            out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+                public void handleMessage(String message) {
+                    System.out.println(message);
+                }
+            });
+            out_server_ws.sendMessage(jsonObject1.toString());
+            System.out.println("hh");
+            Thread.sleep(5000);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (InterruptedException ex) {
+            System.err.println("InterruptedException exception: " + ex.getMessage());
+        } catch (URISyntaxException ex) {
+            System.err.println("URISyntaxException exception: " + ex.getMessage());
         }
 
     }
 
     public int getStatus() {
         return status;
+    }
+
+    public int getMatchId (String data) {
+        String[] listData = data.split(" ");
+//        System.out.println(listData[3]);
+        String match = (String) listData[3].subSequence(0, listData[3].length() - 1);
+        return Integer.valueOf(match);
     }
 
     public void waiting_Hello_packet() {
@@ -220,6 +269,25 @@ public class Server
                 }
             }
         }
+    }
+
+    public JSONObject makeJson_start() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("result", 1);
+        jsonObject.put("ip", "2.tcp.ngrok.io");
+        jsonObject.put("port", 18219);
+        jsonObject.put("path", "/shoot_plane");
+        return jsonObject;
+    }
+
+    public JSONObject makeJson_match(int match_id, int status, int score_1, int score_2) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("result", 2);
+        jsonObject.put("match", match_id);
+        jsonObject.put("status", status);
+        jsonObject.put("id1", score_1);
+        jsonObject.put("id2", score_2);
+        return jsonObject;
     }
 
 
@@ -388,12 +456,14 @@ public class Server
                                     has_change = true;
                                 }
                                 gameClient_2.beShoot(x_location, y_location);
+                                count_time_client_1 --;
                             }
                             if (id_receive == clientID_2) {
                                 if (gameClient_1.checkShoot(x_location, y_location)) {
                                     res = 1;
                                 }
                                 gameClient_1.beShoot(x_location, y_location);
+                                count_time_client_2 --;
                             }
 
                             ByteBuffer before_send = ByteBuffer.allocate(16);
@@ -448,8 +518,6 @@ public class Server
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-
     }
 
     public void checkWinMatch() {
@@ -475,6 +543,17 @@ public class Server
             }
         }
     }
+
+    public void sendResult() {
+        JSONObject jsonObject = makeJson_match(match_id, 1, 0, 0);
+        out_server_ws.sendMessage(jsonObject.toString());
+    }
+
+    public void sendResult_End() {
+        JSONObject jsonObject = makeJson_match(match_id, 2, 100, 50);
+        out_server_ws.sendMessage(jsonObject.toString());
+    }
+
     public boolean checkWin() {
         checkWinMatch();
         if (result_match == -1) {
@@ -564,6 +643,21 @@ public class Server
 
     public Server(int port) {
         try {
+//            server = new ServerSocket(port);
+//            clientTest = new Socket("104.194.240.16", 8881);
+//            in = new DataInputStream(clientTest.getInputStream());
+//            out = new DataOutputStream(clientTest.getOutputStream());
+//            ByteBuffer before_sendz = ByteBuffer.allocate(12);
+//            type_byte = inttobyte(4);
+//            data_byte = inttobyte(8);
+//            before_sendz.put(type_byte);
+//            before_sendz.put(data_byte);
+//            out.write(before_sendz.array());
+//            byte[] pkt_from_server = new byte[5000];
+//            in.read(pkt_from_server);
+//            type_byte = getBytebyIndex(pkt_from_server, 0, 4);
+//            System.out.println("???");
+//            System.out.println(byte_int(type_byte));
             gameClient_1 = new Game(WIDTH_MAP, HEIGHT_MAP);
             gameClient_2 = new Game(WIDTH_MAP, HEIGHT_MAP);
             client_Check = 0;
@@ -584,7 +678,26 @@ public class Server
                 arr_trap[i][0] = random.nextInt(15);
                 arr_trap[i][1] = random.nextInt(15);
             }
-            System.out.println("Server started");
+            System.out.println("Server started-");
+            socket  = server.accept();
+            System.out.println("hello client");
+            in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out_server_game = new DataOutputStream(socket.getOutputStream());
+            byte[] pkt_from_server = new byte[5000];
+            in.read(pkt_from_server);
+            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
+            System.out.println("???");
+            System.out.println("data: " + byteToString(type_byte));
+            ByteBuffer before_send_x = ByteBuffer.allocate(100);
+            String res = "{'result': 1, 'ip': 2.tcp.ngrok.io, 'port': 18219, 'path': /shoot_plane";
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("result", 1);
+            jsonObject.put("ip", "2.tcp.ngrok.io");
+            jsonObject.put("port", 18219);
+            jsonObject.put("path", "/shoot_plane");
+            out_server_game.write(jsonObject.toString().getBytes());
+
+            System.out.println("?????");
 
             System.out.println("Waiting for a client ...");
             index_receive = 0;
@@ -781,6 +894,11 @@ public class Server
         }
     }
 
+    public String make_data_send() {
+        String res = "{'result': 1, 'ip': 2.tcp.ngrok.io, 'port': 18219, 'path': /shoot_plane";
+        return res;
+    }
+
 
     public static byte[] getBytebyIndex(byte[] bytes, int index1, int index2) {
         byte[] outarr = new byte[index2 - index1];
@@ -789,6 +907,8 @@ public class Server
         }
         return outarr;
     }
+
+
     static byte[] inttobyte(int i) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.order(ByteOrder.LITTLE_ENDIAN);
@@ -850,6 +970,6 @@ public class Server
 
     public static void main(String args[])
     {
-        Server server = new Server(8080);
+        Server server = new Server(8881);
     }
 }

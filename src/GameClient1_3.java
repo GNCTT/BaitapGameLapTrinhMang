@@ -39,7 +39,7 @@ public class GameClient1_3 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("127.0.0.1", 8080, game, gameOther);
+        client = new Client("2.tcp.ngrok.io", 15380, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();
@@ -114,29 +114,32 @@ public class GameClient1_3 extends Application {
 //                        render();
 //                        client.has_change = false;
 //                    }
-                    System.out.print("nhap 1 de di chuyen 2 de ban: ");
-                    int command = scanner.nextInt();
-                    System.out.println();
-                    if (command == 1) {
-                        System.out.print("chon huong(0 sang trai, 1 len tren, 2 sang phai, 3 xuong duoi): ");
-                        int dir = scanner.nextInt();
-                        client.sendPktPlay(command, dir);
-                        client.setID_receive(0);
-                        render();
+                    System.out.println("check:   " + clientID + " " + client.getID_receive());
+                    if (client.getID_receive() == clientID) {
+                        System.out.print("nhap 1 de di chuyen 2 de ban: ");
+                        int command = scanner.nextInt();
+                        System.out.println();
+                        if (command == 1) {
+                            System.out.print("chon huong(0 sang trai, 1 len tren, 2 sang phai, 3 xuong duoi): ");
+                            int dir = scanner.nextInt();
+                            client.sendPktPlay(command, dir);
+                            client.setID_receive(0);
+                            render();
 //                        client.readDataFromServer();
 
-                    }
-                    if (command == 2) {
-                        System.out.print(" nhập toạ độ bắn: ");
-                        int x_ = scanner.nextInt();
-                        int y_ = scanner.nextInt();
-                        client.sendPktPlay(command, x_, y_);
-                        client.setID_receive(0);
-                        render();
+                        }
+                        if (command == 2) {
+                            System.out.print(" nhập toạ độ bắn: ");
+                            int x_ = scanner.nextInt();
+                            int y_ = scanner.nextInt();
+                            client.sendPktPlay(command, x_, y_);
+                            client.setID_receive(0);
+                            render();
 //                        client.readDataFromServer();
+                        }
+
+
                     }
-
-
                 }
 
             }
@@ -153,32 +156,20 @@ public class GameClient1_3 extends Application {
 
     public void render() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//        if (status == 0) {
-//            gc.fillText("Set Your Plane", game.getMap().length * WIDTH_DEFAULT + 10, 50);
-//        }
-//        if (status == 1) {
-//            gc.fillText("Move Your Plane", game.getMap().length * WIDTH_DEFAULT + 10, 50);
-//        }
-//        gc.fillText("Your ID: " + String.valueOf(client.getClientID()), game.getMap().length * WIDTH_DEFAULT + 10, 100);
-//        gc.fillText("Your ID: " + String.valueOf(client.getID_receive()), game.getMap().length * WIDTH_DEFAULT + 10, 200);
+        if (status == 0) {
+            gc.fillText("Set Your Plane", game.getMap().length * WIDTH_DEFAULT + 10, 50);
+        }
+        if (status == 1) {
+            gc.fillText("Move Your Plane", game.getMap().length * WIDTH_DEFAULT + 10, 50);
+        }
+        gc.fillText("Your ID: " + String.valueOf(client.getClientID()), game.getMap().length * WIDTH_DEFAULT + 10, 100);
+        gc.fillText("Your ID: " + String.valueOf(client.getID_receive()), game.getMap().length * WIDTH_DEFAULT + 10, 200);
         gc.setFill(Color.BLUE);
         renderMapPlayer();
         renderMapOther();
     }
 
     public void renderMapPlayer() {
-        gc.setFont(new Font(18));
-        gc.setFill(Color.BLACK);
-//        for (int i = 0; i < width_map; i++) {
-//            for (int j = 0; j < height_map; j++) {
-//                if (i == 0) {
-//                    gc.fillText(String.valueOf(j), 30 * j + 30, 25);
-//                }
-//                if (j == 0) {
-//                    gc.fillText(String.valueOf(i), 35 * j, 30 * i + 45);
-//                }
-//            }
-//        }
         game.renderGame(gc, 0, 0);
     }
 

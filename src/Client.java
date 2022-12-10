@@ -140,7 +140,6 @@ public class Client {
                 type_byte = getBytebyIndex(buffer, 0, 4);
                 ID_byte = getBytebyIndex(buffer, 8, 12);
                 int id_receive = bytetoINT(ID_byte);
-                ID_receive = id_receive;
                 System.out.println("fasd: " + id_receive + " " + be_send);
                     int type = bytetoINT(type_byte);
                     System.out.println("type: " + type);
@@ -181,6 +180,8 @@ public class Client {
                         }
                     }
                     if (type == 8) {
+                        ID_byte = getBytebyIndex(buffer, 8, 12);
+                        ID_receive = bytetoINT(ID_byte);
                         x_location_byte = getBytebyIndex(buffer, 12, 16);
                         y_location_byte = getBytebyIndex(buffer, 16, 20);
                         int x_ = bytetoINT(x_location_byte);

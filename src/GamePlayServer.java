@@ -66,7 +66,7 @@ public class GamePlayServer extends Application {
         primaryStage.show();
         gamePlayer_1 = new Game(width_map, height_map);
         gamePlayer_2 = new Game(width_map, height_map);
-        server = new Server(8080, 123, 321, gamePlayer_1, gamePlayer_2);
+        server = new Server(8881, 123, 321, gamePlayer_1, gamePlayer_2);
         arr_trap = server.getArr_trap();
         gamePlayer_1.addTrap(arr_trap);
         gamePlayer_2.addTrap(arr_trap);
@@ -94,6 +94,9 @@ public class GamePlayServer extends Application {
                 if (server.checkWin()) {
                     System.out.println("have Rs");
                     server.sendPkt_End();
+                    server.sendResult_End();
+                } else {
+                    server.sendResult();
                 }
 
             }
