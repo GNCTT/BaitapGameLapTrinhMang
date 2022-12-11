@@ -59,14 +59,8 @@ public class Client {
 
     private static int data_length;
     private static byte[] data_byte;
-    private static byte[] data_byte1;
-    private static byte[] data_byte2;
     private static byte[] pkt_sent;
-    private static byte[] datax = new byte[4];
-    private static byte[] dataN = new byte[4];
-    private static byte[] dataM = new byte[4];
 
-    private static byte[] dataArrElement;
 
     private static byte[] command_byte;
     private static byte[] x_fire_byte;
@@ -94,6 +88,8 @@ public class Client {
     private int result_match;
     private byte result_byte[];
 
+    public int result_turn;
+
     public Client(String host, int port, Game gameClient, GameOther gameOther) {
         this.gameClient = gameClient;
         this.gameOther = gameOther;
@@ -102,6 +98,7 @@ public class Client {
         checkQuitServer = false;
         be_send = false;
         ID_receive = 0;
+        result_turn = -1;
         canMove = false;
         checkMessage = true;
         status = 0;
@@ -168,6 +165,7 @@ public class Client {
                             result_byte = getBytebyIndex(buffer, 12, 16);
                             int result = bytetoINT(result_byte);
                             System.out.println("result: " + result);
+                            result_turn = result;
                             if (result == 0) {
                                 System.out.println("miss");
                             }
@@ -231,13 +229,6 @@ public class Client {
         }
     }
 
-    public void sendPKTPlay() {
-
-    }
-
-    public boolean isCheckMessage() {
-        return checkMessage;
-    }
 
     public void setStatus(int _status) {
         this.status = _status;
@@ -364,9 +355,6 @@ public class Client {
 
     }
 
-    public void sendPktPlay(int dir,int t, int x_location, int y_location) {
-
-    }
 
     public void sendPktPlay(int K, int x_fire, int y_fire) {
         try {
@@ -441,15 +429,6 @@ public class Client {
         return outarr;
     }
 
-    public static int checkPara(String s) {
-        for (int i = 0; i < s.length() / 2; i++) {
-            if (s.charAt(i) != s.charAt(s.length() - i - 1)) {
-                return 0;
-            }
-        }
-        return 1;
-    }
-
 
     static byte[] intobyte(int i) {
         ByteBuffer b = ByteBuffer.allocate(4);
@@ -458,24 +437,7 @@ public class Client {
         return b.array();
     }
 
-    static byte[] make_pkt_hello(int i, String d) {
-        byte type[] = intobyte(i);
-        byte data[] = Stringtobyte(d);
-        int datalen = data.length;
-        byte len[] = intobyte(datalen);
-        ByteBuffer final_array = ByteBuffer.allocate(datalen + 8);
-        final_array.put(type);
-        final_array.put(len);
-        final_array.put(data);
-        return final_array.array();
-    }
 
-    static  byte[] make_pkt_data(byte[] data1, byte[] data2) {
-        ByteBuffer pkt_sent = ByteBuffer.allocate(8);
-        pkt_sent.put(data1);
-        pkt_sent.put(data2);
-        return pkt_sent.array();
-    }
 
     static byte[] make_pkt_send(byte[] type, byte[] len, byte[]data) {
         int size = bytetoINT(len) + 8;

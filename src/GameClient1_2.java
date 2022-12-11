@@ -39,7 +39,7 @@ public class GameClient1_2 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("2.tcp.ngrok.io", 15380, game, gameOther);
+        client = new Client("8.tcp.ngrok.io", 15380, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();

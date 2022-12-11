@@ -39,7 +39,7 @@ public class GameClient1_3 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("2.tcp.ngrok.io", 15380, game, gameOther);
+        client = new Client("8.tcp.ngrok.io", 18341, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();
@@ -109,12 +109,7 @@ public class GameClient1_3 extends Application {
 
                 }
                 if (status == 1 && !client.is_over) {
-//                    client.readDataFromServer();
-//                    if (client.has_change) {
-//                        render();
-//                        client.has_change = false;
-//                    }
-                    System.out.println("check:   " + clientID + " " + client.getID_receive());
+                    System.out.println("check:   " + clientID + " " + client.getID_receive() + " " + getRes() + " " + client.is_over);
                     if (client.getID_receive() == clientID) {
                         System.out.print("nhap 1 de di chuyen 2 de ban: ");
                         int command = scanner.nextInt();
@@ -148,6 +143,25 @@ public class GameClient1_3 extends Application {
 
 
 
+    }
+
+    public String getRes() {
+        String s = "";
+        switch (client.result_turn) {
+            case -1:
+                s += "none";
+                break;
+            case 0:
+                s += "miss";
+                break;
+            case 1:
+                s += "good";
+                break;
+            default:
+                s += "continue";
+                break;
+        }
+        return s;
     }
 
     public void update() {
