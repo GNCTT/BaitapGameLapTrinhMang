@@ -243,7 +243,6 @@ public class Game {
         for (int i = 0; i < mayBay.length; i++) {
             for (int j = 0; j < mayBay.length; j++) {
                 if (mayBay[i][j] == 2) {
-                    System.out.println("location x y : " + i + " " + j);
                     if (j < min) {
                         min = j;
                     }

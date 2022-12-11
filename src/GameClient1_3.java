@@ -114,6 +114,9 @@ public class GameClient1_3 extends Application {
                         System.out.print("nhap 1 de di chuyen 2 de ban: ");
                         int command = scanner.nextInt();
                         System.out.println();
+                        if (client.is_over) {
+                            render();
+                        }
                         if (command == 1) {
                             System.out.print("chon huong(0 sang trai, 1 len tren, 2 sang phai, 3 xuong duoi): ");
                             int dir = scanner.nextInt();

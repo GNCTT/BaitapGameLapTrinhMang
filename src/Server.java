@@ -156,8 +156,8 @@ public class Server
             this.gameClient_2 = gameClient_2;
             point_1 = 0;
             point_2 = 0;
-            count_time_client_1 = 10;
-            count_time_client_2 = 10;
+            count_time_client_1 = 100;
+            count_time_client_2 = 100;
             Random random = new Random();
             result_match = -1;
             has_change = true;
@@ -198,7 +198,7 @@ public class Server
             });
             out_server_ws.sendMessage(jsonObject1.toString());
             System.out.println("hh");
-            Thread.sleep(2000);
+            Thread.sleep(5000);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -542,11 +542,13 @@ public class Server
                 }
             }
         } else {
-            if (gameClient_1.checkLose()) {
-                result_match = 2;
-            }
-            if (gameClient_2.checkLose()) {
-                result_match = 1;
+            if (count_time_client_1 == count_time_client_2) {
+                if (gameClient_1.checkLose()) {
+                    result_match = 2;
+                }
+                if (gameClient_2.checkLose()) {
+                    result_match = 1;
+                }
             }
         }
     }
@@ -556,6 +558,11 @@ public class Server
         int score_client_2 = 200 - count_time_client_2;
         JSONObject jsonObject = makeJson_match(match_id, 1, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void sendResult_End() {
@@ -563,6 +570,11 @@ public class Server
         int score_client_2 = 200 - count_time_client_2;
         JSONObject jsonObject = makeJson_match(match_id, 2, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean checkWin() {
@@ -648,9 +660,6 @@ public class Server
         return false;
     }
 
-    public void waiting_Other_Pkt() {
-
-    }
 
 
     public String make_data_send() {
@@ -688,43 +697,10 @@ public class Server
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    static byte[] make_pkt_send(byte[] type, byte[] len, byte[]data) {
-        int size = byte_int(len) + 8;
-        ByteBuffer pkt_sent = ByteBuffer.allocate(size);
-        pkt_sent.put(type);
-        pkt_sent.put(len);
-        pkt_sent.put(data);
-        return pkt_sent.array();
-    }
 
-    public static int getRandIndex(int length) {
-        Random rand = new Random();
-        return rand.nextInt(length);
-    }
 
     public int[][] getArr_trap() {
         return arr_trap;
-    }
-
-    public static String[] removeAStrByIndex(int index, String[] arrTest) {
-        String [] arrTest2 = new String[arrTest.length - 1];
-        for (int i = 0; i < arrTest.length; i++) {
-            if (i < index) {
-                arrTest2[i] = arrTest[i];
-            }
-            if (i > index) {
-                arrTest2[i - 1] = arrTest[i];
-            }
-        }
-        return arrTest2;
-    }
-
-    public int hashIDFromMSV(String _msv)  {
-        String s_out = "";
-        for (int i = 0; i < _msv.length(); i++) {
-            s_out += (char)((int)_msv.charAt(i) * 5 % 10 + 49);
-        }
-        return Integer.valueOf(s_out);
     }
 
 }

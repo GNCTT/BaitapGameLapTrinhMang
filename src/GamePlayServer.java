@@ -33,6 +33,7 @@ public class GamePlayServer extends Application {
 
 
     Executor threadPool = Executors.newFixedThreadPool(5);
+    Executor threadPool1 = Executors.newFixedThreadPool(5);
 
 
     @Override
@@ -76,6 +77,21 @@ public class GamePlayServer extends Application {
                     }
 
                 }
+//                if (server.checkWin()) {
+//                    System.out.println("have Rs");
+//                    server.sendPkt_End();
+//                    server.sendResult_End();
+//                } else {
+//                    server.sendResult();
+//                }
+
+            }
+
+        });
+
+        threadPool.execute(() -> {
+            while (true) {
+
                 if (server.checkWin()) {
                     System.out.println("have Rs");
                     server.sendPkt_End();
