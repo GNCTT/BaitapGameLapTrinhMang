@@ -116,6 +116,7 @@ public class GameClient1_2 extends Application {
 //                    }
                     System.out.println("check:   " + clientID + " " + client.getID_receive());
                     if (client.getID_receive() == clientID) {
+                        render();
                         System.out.print("nhap 1 de di chuyen 2 de ban: ");
                         int command = scanner.nextInt();
                         System.out.println();

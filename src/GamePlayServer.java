@@ -24,30 +24,15 @@ public class GamePlayServer extends Application {
     private Game gamePlayer_2;
     private boolean has_change;
 
-//    private int x_set_plane_1;
-//    private int y_set_plane_1;
-//
-//    private int x_set_plane_2;
-//    private int y_set_plane_2;
-
-//    private Client client;
 
     private Server server;
 
-//    private int clientID;
-//
-//    private int status;
 
     private int width_map;
     private int height_map;
 
-//    private int time_check;
-
-//
-//    private int MAX_TIME_CHECK = 100;
 
     Executor threadPool = Executors.newFixedThreadPool(5);
-    Executor threadPool1 = Executors.newFixedThreadPool(5);
 
 
     @Override
@@ -139,6 +124,4 @@ public class GamePlayServer extends Application {
         gamePlayer_2.renderGame(gc, start_x, start_y);
     }
 
-    public void update() {
-    }
 }

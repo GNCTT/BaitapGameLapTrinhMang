@@ -98,7 +98,9 @@ public class Game {
     }
 
     public boolean checkLocationPlane(int x_plane, int y_plane) {
-        if (x_plane - mayBay.length / 2 < 0 || x_plane >= map.length - mayBay.length / 2 || y_plane < mayBay.length / 2 || y_plane >= map.length - mayBay.length / 2) {
+        System.out.println("left: " + getLeftPlane() + " right: " + getRightPlane());
+
+        if (x_plane - getLeftPlane() < 0 || x_plane + getRightPlane() >= map.length|| y_plane - getTopPlane() < 0 || y_plane + getBotPlane() >= map.length) {
             return false;
         } else {
             int start_x = x_plane - mayBay.length / 2;
@@ -130,8 +132,9 @@ public class Game {
         if (dir == 3) {
             reloadPlane(mayBay4);
         }
+        System.out.println("left: " + getLeftPlane() + " right: " + getRightPlane());
 
-        if (x_plane - mayBay.length / 2 < 0 || x_plane >= map.length - mayBay.length / 2 || y_plane < mayBay.length / 2 || y_plane >= map.length - mayBay.length / 2) {
+        if (x_plane - getLeftPlane() < 0 || x_plane + getRightPlane() >= map.length|| y_plane - getTopPlane() < 0 || y_plane + getBotPlane() >= map.length) {
             return false;
         } else {
             int start_x = x_plane - mayBay.length / 2;
@@ -235,6 +238,67 @@ public class Game {
         reloadPlane(mayBay2);
     }
 
+    public int getLeftPlane() {
+        int min = 9;
+        for (int i = 0; i < mayBay.length; i++) {
+            for (int j = 0; j < mayBay.length; j++) {
+                if (mayBay[i][j] == 2) {
+                    System.out.println("location x y : " + i + " " + j);
+                    if (j < min) {
+                        min = j;
+                    }
+                }
+            }
+        }
+        return mayBay.length / 2 - min;
+    }
+
+    public int getRightPlane() {
+        int max = -9;
+        for (int i = 0; i < mayBay.length; i++) {
+            for (int j = 0; j < mayBay.length; j++) {
+                if (mayBay[i][j] == 2) {
+                    if (j > max) {
+                        max = j;
+                    }
+                }
+            }
+        }
+        return max - mayBay.length / 2;
+    }
+
+    public int getBotPlane() {
+        int max = -9;
+        for (int i = 0; i < mayBay.length; i++) {
+            for (int j = 0; j < mayBay.length; j++) {
+                if (mayBay[i][j] == 2) {
+                    if (i > max) {
+                        max = i;
+                    }
+                }
+            }
+        }
+        return max - mayBay.length / 2;
+    }
+
+    public int getTopPlane() {
+        int min = 9;
+        for (int i = 0; i < mayBay.length; i++) {
+            for (int j = 0; j < mayBay.length; j++) {
+                if (mayBay[i][j] == 2) {
+                    if (i < min) {
+                        min = i;
+                    }
+                }
+            }
+        }
+        return mayBay.length / 2 - min;
+    }
+
+
+
+
+
 
     public boolean checkMove(int dir) {
         switch (dir) {
@@ -299,6 +363,9 @@ public class Game {
         }
         return false;
     }
+
+
+
     public void beShoot(int x, int y) {
         System.out.println("map: " + map[y][x]);
         if (map[y][x] == 2) {
@@ -339,119 +406,6 @@ public class Game {
         }
     }
 
-
-    public Game(){
-        action = -1;
-    }
-//    public static int getHeight() {
-//        return height;
-//    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-//    public static int getWidth() {
-//        return width;
-//    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void renderMap() {
-        System.out.println("---------------MAP---------------");
-        int count=0;
-        for(int i=-1;i<=height;i++){
-            for(int j=-1;j<=width;j++){
-                if(i==-1 ){
-                    if(j==-1){
-                        System.out.print("   ");
-                    } else if (j==width) {
-                        System.out.print("  ");
-                    }else if(j>=0 && j<10){
-                        System.out.print(j + "  ");
-                    }else if(j>=10 && j<height){
-                        System.out.print(j + " ");
-                    }
-                } else if (i>=0 && i<10){
-                    if(j==-1){
-                        System.out.print(i + "  ");
-                    } else if (j>=0 && j<width) {
-                        if(map[i][j]==0){
-                            System.out.print(".  ");
-                        } else if(map[i][j]==1) {
-                            System.out.print("0  ");
-                        } else if (map[i][j]==2) {
-                            System.out.print("*  ");
-                        } else if (map[i][j]==3) {
-                            System.out.print("#  ");
-                        }else if (map[i][j]==4) {
-                            System.out.print("&  ");
-                        }
-                    }else if (j==width) {
-                        System.out.print(i + "  ");
-                    }
-                }else if (i>=10 && i<width){
-                    if(j==-1){
-                        System.out.print(i + " ");
-                    } else if (j>=0 && j<width) {
-                        if(map[i][j]==0){
-                            System.out.print(".  ");
-                        } else if(map[i][j]==1) {
-                            System.out.print("0  ");
-                        } else if (map[i][j]==2) {
-                            System.out.print("*  ");
-                        } else if (map[i][j]==3) {
-                            System.out.print("#  ");
-                        }else if (map[i][j]==4) {
-                            System.out.print("&  ");
-                        }
-                    } else if (j==width) {
-                        System.out.print(i + "  ");
-                    }
-                } else if (i==height) {
-                    if(j==-1){
-                        System.out.print("   ");
-                    } else if (j==width) {
-                        System.out.print("  ");
-                    }else if(j>=0 && j<10){
-                        System.out.print(j + "  ");
-                    }else if(j>=10 && j<height){
-                        System.out.print(j + " ");
-                    }
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    public void createMap() {
-        map = new int [width][height];
-        for(int i=0;i<height;i++){
-            for(int j=0;j<width;j++){
-                map[i][j]=0;
-            }
-        }
-    }
-
-
-    public void chonHuongMayBay(){
-        Scanner in= new Scanner(System.in);
-        boolean check=true;
-        while (check){
-            System.out.println("-------------------------Chọn Hướng Máy Bay--------------------------");
-            System.out.print("Nhap Huong ( 1: Len, 2: Phai, 3: Xuong, 4: Trai) : ");
-            int move= in.nextInt();
-            if(move>=1 && move<=4){
-                check=false;
-                dir = move;
-            }else{
-                //Khong Hop Le
-                System.out.println("Lua Chon Khong Hop Le !! Vui Long Chon Lai !!");
-            }
-        }
-    }
 
     public void renderGame(GraphicsContext gc, int Start_x, int Start_Y) {
         for (int i = 0; i < map.length; i++) {

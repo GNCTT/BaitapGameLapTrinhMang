@@ -112,6 +112,9 @@ public class Server
     private boolean client2_send;
     private Socket clientTest;
 
+    private int point_1;
+    private int point_2;
+
 
 
     private final static int WIDTH_MAP = 20;
@@ -151,6 +154,8 @@ public class Server
             this.clientID_2 = clientID_2;
             this.gameClient_1 = gameClient_1;
             this.gameClient_2 = gameClient_2;
+            point_1 = 0;
+            point_2 = 0;
             count_time_client_1 = 10;
             count_time_client_2 = 10;
             Random random = new Random();
@@ -193,7 +198,7 @@ public class Server
             });
             out_server_ws.sendMessage(jsonObject1.toString());
             System.out.println("hh");
-            Thread.sleep(5000);
+            Thread.sleep(2000);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -363,9 +368,6 @@ public class Server
 
     }
 
-    public void waiting_set_plane() {
-
-    }
 
     public void waiting_PKT_Play() {
         if (client_first == clientID_2) {
@@ -452,8 +454,11 @@ public class Server
                             if (id_receive == clientID_1) {
                                 if (gameClient_2.checkShoot(x_location, y_location)) {
                                     res = 1;
-                                    gameClient_2.beShoot(x_location, y_location);
+//                                    gameClient_2.beShoot(x_location, y_location);
                                     has_change = true;
+                                    point_1 = 10;
+                                } else {
+                                    point_1 = 0;
                                 }
                                 gameClient_2.beShoot(x_location, y_location);
                                 count_time_client_1 --;
@@ -461,6 +466,10 @@ public class Server
                             if (id_receive == clientID_2) {
                                 if (gameClient_1.checkShoot(x_location, y_location)) {
                                     res = 1;
+                                    has_change = true;
+                                    point_2 = 10;
+                                } else {
+                                    point_2 = 0;
                                 }
                                 gameClient_1.beShoot(x_location, y_location);
                                 count_time_client_2 --;
@@ -509,8 +518,6 @@ public class Server
                                 before_send2.put(ID_byte);
                                 out.write(before_send2.array());
                             }
-
-
                         }
 
                 }
@@ -545,12 +552,16 @@ public class Server
     }
 
     public void sendResult() {
-        JSONObject jsonObject = makeJson_match(match_id, 1, 0, 0);
+        int score_client_1 = 200 - count_time_client_1;
+        int score_client_2 = 200 - count_time_client_2;
+        JSONObject jsonObject = makeJson_match(match_id, 1, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
     }
 
     public void sendResult_End() {
-        JSONObject jsonObject = makeJson_match(match_id, 2, 100, 50);
+        int score_client_1 = 200 - count_time_client_1;
+        int score_client_2 = 200 - count_time_client_2;
+        JSONObject jsonObject = makeJson_match(match_id, 2, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
     }
 
@@ -641,258 +652,6 @@ public class Server
 
     }
 
-    public Server(int port) {
-        try {
-//            server = new ServerSocket(port);
-//            clientTest = new Socket("104.194.240.16", 8881);
-//            in = new DataInputStream(clientTest.getInputStream());
-//            out = new DataOutputStream(clientTest.getOutputStream());
-//            ByteBuffer before_sendz = ByteBuffer.allocate(12);
-//            type_byte = inttobyte(4);
-//            data_byte = inttobyte(8);
-//            before_sendz.put(type_byte);
-//            before_sendz.put(data_byte);
-//            out.write(before_sendz.array());
-//            byte[] pkt_from_server = new byte[5000];
-//            in.read(pkt_from_server);
-//            type_byte = getBytebyIndex(pkt_from_server, 0, 4);
-//            System.out.println("???");
-//            System.out.println(byte_int(type_byte));
-            gameClient_1 = new Game(WIDTH_MAP, HEIGHT_MAP);
-            gameClient_2 = new Game(WIDTH_MAP, HEIGHT_MAP);
-            client_Check = 0;
-            listSockets = new ArrayList<>();
-            server = new ServerSocket(port);
-            ins = new ArrayList<>();
-            outs = new ArrayList<>();
-            arr_trap = new int[NUM_TRAP][2];
-            clientID = 123;
-            clientID_1 = 123;
-            clientID_2 = 321;
-            turn_check = true;
-            set_plan_ok = false;
-            is_over = false;
-
-            Random random = new Random();
-            for (int i = 0; i < NUM_TRAP; i++) {
-                arr_trap[i][0] = random.nextInt(15);
-                arr_trap[i][1] = random.nextInt(15);
-            }
-            System.out.println("Server started-");
-            socket  = server.accept();
-            System.out.println("hello client");
-            in = new DataInputStream(socket.getInputStream());
-            DataOutputStream out_server_game = new DataOutputStream(socket.getOutputStream());
-            byte[] pkt_from_server = new byte[5000];
-            in.read(pkt_from_server);
-            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
-            System.out.println("???");
-            System.out.println("data: " + byteToString(type_byte));
-            ByteBuffer before_send_x = ByteBuffer.allocate(100);
-            String res = "{'result': 1, 'ip': 2.tcp.ngrok.io, 'port': 18219, 'path': /shoot_plane";
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("result", 1);
-            jsonObject.put("ip", "2.tcp.ngrok.io");
-            jsonObject.put("port", 18219);
-            jsonObject.put("path", "/shoot_plane");
-            out_server_game.write(jsonObject.toString().getBytes());
-
-            System.out.println("?????");
-
-            System.out.println("Waiting for a client ...");
-            index_receive = 0;
-            int countClient = 0;
-            while (countClient != 2) {
-                socket = server.accept();
-                in = new DataInputStream(
-                        socket.getInputStream());
-                out = new DataOutputStream(socket.getOutputStream());
-                ins.add(in);
-                outs.add(out);
-                countClient += 1;
-
-            }
-            System.out.println("Client accepted");
-
-            //receive_PKT_HELLO_AND_Send_MAP
-            int count_Send_Hello = 0;
-            for (int i = 0; i < ins.size(); i++) {
-                in = ins.get(i);
-                out = outs.get(i);
-                if (i == 0) {
-                    clientID = clientID_1;
-                } else {
-                    clientID = clientID_2;
-                }
-                pkt_from_client = new byte[5000];
-                in.read(pkt_from_client);
-                type_byte = getBytebyIndex(pkt_from_client, 0, 4);
-                len_byte = getBytebyIndex(pkt_from_client, 4, 8);
-                int len = byte_int(len_byte);
-                data_byte = getBytebyIndex(pkt_from_client, 8, 8 + len);
-                String msv = byteToString(data_byte);
-                System.out.println(msv);
-                if (i == 0) {
-                    gameClient_1.addTrap(arr_trap);
-                    gameClient_1.render();
-                } else {
-                    gameClient_2.addTrap(arr_trap);
-                    gameClient_2.render();
-                }
-                int size_pkt = 4 * (4 + NUM_TRAP * 2);
-                ByteBuffer before_send = ByteBuffer.allocate(16 + size_pkt);
-                before_send.put(inttobyte(0));
-                before_send.put(inttobyte(0));
-                type_byte = inttobyte(PKT_CREATE_MAP);
-                len_byte = inttobyte(size_pkt);
-                ID_byte = inttobyte(clientID);
-                width_byte = inttobyte(WIDTH_MAP);
-                height_byte = inttobyte(HEIGHT_MAP);
-                num_trap_byte = inttobyte(NUM_TRAP);
-                before_send.put(type_byte);
-                before_send.put(len_byte);
-                before_send.put(ID_byte);
-                before_send.put(width_byte);
-                before_send.put(height_byte);
-                before_send.put(num_trap_byte);
-                for (int index = 0; index < NUM_TRAP; index++) {
-                    x_location_trap = inttobyte(arr_trap[index][0]);
-                    y_location_trap = inttobyte(arr_trap[index][1]);
-                    before_send.put(x_location_trap);
-                    before_send.put(y_location_trap);
-                }
-                out.write(before_send.array());
-            }
-            clientID = clientID_1;
-            out = outs.get(0);
-            in = ins.get(0);
-            int count_set_plane = 0;
-
-            while (true) {
-//                for (int index = 0; index < ins.size(); index++) {
-//                    in = ins.get(index);
-//                    out = outs.get(index);
-                try {
-                        pkt_from_client = new byte[5000];
-                        in.read(pkt_from_client);
-                        type_byte = getBytebyIndex(pkt_from_client, 0, 4);
-                        len_byte = getBytebyIndex(pkt_from_client, 4, 8);
-                        int len = byte_int(len_byte);
-                        data_byte = getBytebyIndex(pkt_from_client, 8, 8 + len);
-                        int type = byte_int(type_byte);
-                        System.out.println();
-                        if (type == SET_PLANE_PKT) {
-                            //get result
-                            ID_byte = getBytebyIndex(data_byte, 0, 4);
-                            dir_byte = getBytebyIndex(data_byte, 4, 8);
-                            x_location_byte = getBytebyIndex(data_byte, 8, 12);
-                            y_location_byte = getBytebyIndex(data_byte, 12, 16);
-                            clientID = byte_int(ID_byte);
-                            //xac dinh may bay nao
-                            dir_plane = byte_int(dir_byte);
-                            x_location = byte_int(x_location_byte);
-                            y_location = byte_int(y_location_byte);
-                            //check vi tri dat may bay va check thong tin nguoi gui.
-                            System.out.println("type: " + type + " result: " + byte_int(ID_byte) + " index_receive: " + index_receive);
-                            System.out.println(x_location + "   ----   " + y_location);
-                            boolean checkSetPlane = false;
-                            if (clientID == clientID_1 && gameClient_1.checkLocationPlane(x_location, y_location)) {
-                                count_set_plane ++;
-                                checkSetPlane = true;
-                            }
-                            if (clientID == clientID_2 && gameClient_2.checkLocationPlane(x_location, y_location)) {
-                                count_set_plane ++;
-                                checkSetPlane = true;
-                            }
-                            // checkplane method
-
-                            if (checkSetPlane) {
-                                ByteBuffer before_send = ByteBuffer.allocate(12);
-                                type_byte = inttobyte(TURN_PKT_TYPE);
-                                len_byte = inttobyte(4);
-                                ID_byte = inttobyte(clientID);
-                                System.out.println("---send_to" + clientID);
-                                before_send.put(type_byte);
-                                before_send.put(len_byte);
-                                before_send.put(ID_byte);
-                                out.write(before_send.array());
-                            }
-                            if (count_set_plane == 2) {
-                                checkSetPlane = true;
-                            }
-                            else {
-                                ByteBuffer before_send = ByteBuffer.allocate(12);
-                                type_byte = inttobyte(BYE_PKT_TYPE);
-                                len_byte = inttobyte(4);
-                                data_byte = inttobyte(4);
-                                before_send.put(type_byte);
-                                before_send.put(len_byte);
-                                before_send.put(data_byte);
-                                out.write(before_send.array());
-                                break;
-                            }
-
-                        }
-
-                        if (type == PLAY_PKT_TYPE) {
-                            ID_byte = getBytebyIndex(pkt_from_client, 8, 12);
-                            clientID = byte_int(ID_byte);
-                            System.out.println("pkt_play " + clientID);
-                            command_byte = getBytebyIndex(pkt_from_client, 12, 16);
-                            command = byte_int(command_byte);
-                            if (command == 1) {
-                                dir_byte = getBytebyIndex(pkt_from_client, 16, 20);
-                                dir_plane = byte_int(dir_byte);
-
-                                //chang_by_ID
-                            } else {
-                                x_fire_byte = getBytebyIndex(pkt_from_client, 16, 20);
-                                y_fire_byte = getBytebyIndex(pkt_from_client, 20, 24);
-                                //chang_by_ID
-
-                            }
-
-                            if (!is_over) {
-                                ByteBuffer before_send = ByteBuffer.allocate(12);
-                                type_byte = inttobyte(TURN_PKT_TYPE);
-                                len_byte = inttobyte(4);
-
-                                System.out.println("---send_to" + clientID);
-                                before_send.put(type_byte);
-                                before_send.put(len_byte);
-                                before_send.put(ID_byte);
-                                out.write(before_send.array());
-                                //check till is_win = true
-
-                            }
-                        }
-
-                } catch (IOException i) {
-                    System.out.println(i);
-                }
-                if (clientID == clientID_1) {
-                    clientID = clientID_2;
-                    out = outs.get(1);
-                    in = ins.get(1);
-                } else {
-                    clientID = clientID_1;
-                    out = outs.get(0);
-                    in = ins.get(0);
-                }
-            }
-//            }
-//            System.out.println("Closing connection");
-//            // close connection
-//            socket.close();
-//            in.close();
-//            out.close();
-        }
-
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
-    }
 
     public String make_data_send() {
         String res = "{'result': 1, 'ip': 2.tcp.ngrok.io, 'port': 18219, 'path': /shoot_plane";
@@ -968,8 +727,4 @@ public class Server
         return Integer.valueOf(s_out);
     }
 
-    public static void main(String args[])
-    {
-        Server server = new Server(8881);
-    }
 }

@@ -17,6 +17,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -43,7 +44,7 @@ public class GamePlayCLient extends Application {
     private int x_set_plane;
     private int y_set_plane;
 
-    private Client client;
+//    private Client client;
 
     private int clientID;
 
@@ -70,14 +71,21 @@ public class GamePlayCLient extends Application {
         Scene scene = new Scene(root);
         game = new Game(width_map, height_map);
         gameOther = new GameOther(width_map, height_map);
-        client = new Client("127.0.0.1", 8080, game, gameOther);
-        arr_trap = client.getArr_trap();
+//        client = new Client("127.0.0.1", 8080, game, gameOther);
+//        arr_trap = client.getArr_trap();
+        int NUM_TRAP = 15;
+        Random random = new Random();
+        arr_trap = new int[NUM_TRAP][2];
+        for (int i = 0; i < NUM_TRAP; i++) {
+            arr_trap[i][0] = random.nextInt(15);
+            arr_trap[i][1] = random.nextInt(15);
+        }
         game.addTrap(arr_trap);
         gameOther.add_trap(arr_trap);
-        status = client.getStatus();
+//        status = client.getStatus();
         System.out.println("jjda " + width_map + " " + height_map);
 
-        clientID = client.getClientID();
+//        clientID = client.getClientID();
 
 //        game.setPlane(0, 0);
 
@@ -90,59 +98,70 @@ public class GamePlayCLient extends Application {
                 if (status == 0 && game.checkLocationPlane(x_set_plane, y_set_plane)) {
                     status = 1;
                     int dir = 1;
-                    client.sendSetPlanePkt(dir, x_set_plane, y_set_plane);
-                    client.readDataFromServer();
-                    System.out.println("ID: " + clientID + " " + client.getClientID());
-                    if (clientID == client.getID_receive()) {
-                        game.setPlane(x_set_plane, y_set_plane);
-                    }
+//                    client.sendSetPlanePkt(dir, x_set_plane, y_set_plane);
+//                    client.readDataFromServer();
+//                    System.out.println("ID: " + clientID + " " + client.getClientID());
+                    game.setPlane(x_set_plane, y_set_plane);
+//                    if (clientID == client.getID_receive()) {
+//
+//                    }
                 }
+
+                if (status == 1) {
+                    game.beShoot(x_set_plane, y_set_plane);
+                }
+                game.renderGame(gc, 0, 0);
 
             }
         });
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
             if (key.getCode() == KeyCode.RIGHT) {
-                client.sendPktPlay(1, 0, 0);
-                client.readDataFromServer();
+//                client.sendPktPlay(1, 0, 0);
+//                client.readDataFromServer();
                 System.out.println("hello");
-                if (client.isCanMove()) {
-                    game.move(2);
-                    client.setCanMove(false);
-                    client.setStatus(2);
-                }
+                game.move(2);
+//                if (client.isCanMove()) {
+//                    game.move(2);
+//                    client.setCanMove(false);
+//                    client.setStatus(2);
+//                }
 
             }
             if (key.getCode() == KeyCode.LEFT) {
 //                    client.readDataFromServer();
-                client.sendPktPlay(1, 0, 0, 0);
-                client.readDataFromServer();
-                System.out.println("check: " + client.isCanMove());
-                if (client.isCanMove()) {
-                    game.move(0);
-                    client.setCanMove(false);
-                    client.setStatus(2);
-                }
+//                client.sendPktPlay(1, 0, 0, 0);
+//                client.readDataFromServer();
+//                System.out.println("check: " + client.isCanMove());
+                game.move(0);
+//                if (client.isCanMove()) {
+//                    game.move(0);
+//                    client.setCanMove(false);
+//                    client.setStatus(2);
+//                }
             }
             if (key.getCode() == KeyCode.UP) {
-                client.sendPktPlay(1, 1, 0, 0);
-                client.readDataFromServer();
-                System.out.println("check: " + client.isCanMove());
-                if (client.isCanMove()) {
-                    game.move(1);
-                    client.setCanMove(false);
-                    client.setStatus(2);
-                }
+//                client.sendPktPlay(1, 1, 0, 0);
+//                client.readDataFromServer();
+//                System.out.println("check: " + client.isCanMove());
+                game.move(1);
+//                if (client.isCanMove()) {
+//                    game.move(1);
+//                    client.setCanMove(false);
+//                    client.setStatus(2);
+//                }
             }
             if (key.getCode() == KeyCode.DOWN) {
-                client.sendPktPlay(1, 3, 0, 0);
-                client.readDataFromServer();
-                System.out.println("check: " + client.isCanMove());
-                if (client.isCanMove()) {
-                    game.move(3);
-                    client.setCanMove(false);
-                    client.setStatus(2);
-                }
+//                client.sendPktPlay(1, 3, 0, 0);
+//                client.readDataFromServer();
+//                System.out.println("check: " + client.isCanMove());
+                game.move(3);
+//                if (client.isCanMove()) {
+//                    game.move(3);
+//                    client.setCanMove(false);
+//                    client.setStatus(2);
+//                }
             }
+            game.renderGame(gc, 0, 0);
 
         });
 
@@ -167,39 +186,6 @@ public class GamePlayCLient extends Application {
 //
 //        timer.start();
 
-        threadPool.execute(()-> {
-            System.out.println("w");
-           Scanner sc = new Scanner(System.in);
-
-           while (true) {
-               System.out.println("hello_123");
-               update();
-               if (client.has_change) {
-                   render();
-                   System.out.println("???");
-                   client.has_change = false;
-               }
-               int t = sc.nextInt();
-               if (t == 1) {
-                   System.out.println("nhap toa do x y:");
-                   int x = sc.nextInt();
-                   int y = sc.nextInt();
-                   if (game.checkLocationPlane(x, y)) {
-
-                       status = 1;
-                       int dir = 1;
-                       client.sendSetPlanePkt(dir, x, y);
-                       client.readDataFromServer();
-                       System.out.println("ID: " + clientID + " " + client.getClientID());
-                       if (clientID == client.getID_receive()) {
-                           game.setPlane(x_set_plane, y_set_plane);
-                           System.out.println("setPlaneOk");
-                           render();
-                       }
-                   }
-               }
-           }
-        });
 
     }
 
@@ -219,7 +205,7 @@ public class GamePlayCLient extends Application {
             gc.fillText("Move Your Plane", map.length * WIDTH_DEFAULT + 10, 50);
         }
         gc.fillText("Your ID: " + String.valueOf(clientID), map.length * WIDTH_DEFAULT + 10, 100);
-        gc.fillText("Your ID: " + String.valueOf(client.getID_receive()), map.length * WIDTH_DEFAULT + 10, 200);
+//        gc.fillText("Your ID: " + String.valueOf(client.getID_receive()), map.length * WIDTH_DEFAULT + 10, 200);
         gc.setFill(Color.BLUE);
         renderMapPlayer();
         renderMapOther();
