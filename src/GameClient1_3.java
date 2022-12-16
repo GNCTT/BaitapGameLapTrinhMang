@@ -1,6 +1,5 @@
 import Start.Game;
 import Start.GameOther;
-import com.sun.deploy.util.SessionState;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -10,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -29,8 +29,13 @@ public class GameClient1_3 extends Application {
 
     private final int WIDTH_DEFAULT = 30;
     private final int HEIGHT_DEFAULT = 30;
-
+    //    private int dir ;
+//    private int x_ ;
+//    private int y_ ;
+    private int xFire = 20;
+    private int yFire = 19;
     private int status;
+    Random rand = new Random();
 
     Executor threadPool = Executors.newFixedThreadPool(5);
     Executor threadPool2 = Executors.newFixedThreadPool(5);
@@ -39,12 +44,11 @@ public class GameClient1_3 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("8.tcp.ngrok.io", 18341, game, gameOther);
+        client = new Client("0.tcp.ngrok.io", 13410, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();
         height_map = client.getHeight_map();
-
         canvas = new Canvas(WIDTH_DEFAULT * width_map * 2 + 200, HEIGHT_DEFAULT * height_map);
         gc = canvas.getGraphicsContext2D();
         Group root = new Group();
@@ -91,9 +95,12 @@ public class GameClient1_3 extends Application {
                     while (loop) {
                         //need validate
                         System.out.print("đặt máy bay(hướng, toạ độ x, tọa độ y): ");
-                        dir = scanner.nextInt();
-                        x_ = scanner.nextInt();
-                        y_ = scanner.nextInt();
+//                        dir = scanner.nextInt();
+//                        x_ = scanner.nextInt();
+//                        y_ = scanner.nextInt();
+                        dir = 2;
+                        x_ = 17;
+                        y_ = 17;
                         if (game.checkLocationPlane(dir, x_, y_)) {
                             loop = false;
                         }
@@ -103,23 +110,23 @@ public class GameClient1_3 extends Application {
                     client.setID_receive(0);
 //                    render();
 //                    client.readDataFromServer();
-
-
                     status = 1;
-
                 }
                 if (status == 1 && !client.is_over) {
                     System.out.println("check:   " + clientID + " " + client.getID_receive() + " " + getRes() + " " + client.is_over);
                     if (client.getID_receive() == clientID) {
                         System.out.print("nhap 1 de di chuyen 2 de ban: ");
-                        int command = scanner.nextInt();
+                        int command = 2 ;
+//                        int command = rand.nextInt(2)+1;
+//                        int command = scanner.nextInt();
                         System.out.println();
                         if (client.is_over) {
                             render();
                         }
                         if (command == 1) {
                             System.out.print("chon huong(0 sang trai, 1 len tren, 2 sang phai, 3 xuong duoi): ");
-                            int dir = scanner.nextInt();
+                            int dir = rand.nextInt(4);
+//                            int dir = scanner.nextInt();
                             client.sendPktPlay(command, dir);
                             client.setID_receive(0);
                             render();
@@ -128,9 +135,21 @@ public class GameClient1_3 extends Application {
                         }
                         if (command == 2) {
                             System.out.print(" nhập toạ độ bắn: ");
-                            int x_ = scanner.nextInt();
-                            int y_ = scanner.nextInt();
-                            client.sendPktPlay(command, x_, y_);
+//                            int xFire = -1;
+//                            int yFire = 0;
+                            xFire--;
+                            if(xFire<15){
+                                xFire=19;
+                                yFire--;
+                                if (yFire<15){
+                                    yFire=19;
+                                    xFire=19;
+                                }
+                            }
+//                            int x_ = scanner.nextInt();
+//                            int y_ = scanner.nextInt();
+                            System.out.println("--------"+xFire +" --- "+yFire);
+                            client.sendPktPlay(command, xFire, yFire);
                             client.setID_receive(0);
                             render();
 //                        client.readDataFromServer();
@@ -142,10 +161,6 @@ public class GameClient1_3 extends Application {
 
             }
         });
-
-
-
-
     }
 
     public String getRes() {

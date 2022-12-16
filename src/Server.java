@@ -49,7 +49,6 @@ public class Server
     private int clientID_1;
     private int clientID_2;
     private byte pkt_from_client[];
-
     private byte dir_byte[];
     private int dir_plane;
     private byte x_location_byte[];
@@ -59,38 +58,26 @@ public class Server
     private byte pkt_send[];
     private byte type_byte[];
     private byte len_byte[];
-
     private int sizeOfPacket;
     private byte data_byte[];
-
     private byte ID_byte[];
     private byte width_byte[];
     private byte height_byte[];
-
     private byte num_trap_byte[];
-
     private byte x_location_trap[];
     private byte y_location_trap[];
-
     private byte command_byte[];
-
     private int command;
-
     private byte x_fire_byte[];
     private byte y_fire_byte[];
-
     private int x_fire;
     private int y_fire;
-
     private byte result_byte[];
     private int result;
-
     int index_receive;
-
     private boolean turn_check;
     private boolean set_plan_ok;
     private boolean is_over;
-
     private int count_time_client_1;
     private int count_time_client_2;
     Game gameClient_1;
@@ -126,11 +113,16 @@ public class Server
 
     private int result_match;
 
-    static int[][] mayBay ={{0,0,2,0,0},       //          2
-            {0,2,0,0,2},       //         2  2
-            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-            {0,2,0,0,2},       //         2  2
-            {0,0,2,0,0}};
+//    static int[][] mayBay ={{0,0,2,0,0},       //          2
+//            {0,2,0,0,2},       //         2  2
+//            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+//            {0,2,0,0,2},       //         2  2
+//            {0,0,2,0,0}};
+static int[][] mayBay ={{0,0,2,0,0},       //          2
+                        {0,2,0,0,2},       //         2  2
+                        {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
+                        {0,2,0,0,2},       //         2  2
+                        {0,0,2,0,0}};
 
     public Server(int port, int clientID_1, int clientID_2, Game gameClient_1, Game gameClient_2) {
         try {

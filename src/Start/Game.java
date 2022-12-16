@@ -3,8 +3,6 @@ package Start;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.Scanner;
-
 //import static Start.RotatePlane.*;
 
 public class Game {
@@ -22,6 +20,11 @@ public class Game {
                              {2,0,2,0,2},       //        22222      *Tam may bay o toa do [2;2]*
                              {0,0,2,0,0},       //         2  2
                              {2,2,2,2,2}};
+//    private int[][] mayBay2 ={{0,0,2,0,0},       //          2
+//                              {0,0,0,0,0},       //         2  2
+//                              {0,0,0,0,0},       //        22222      *Tam may bay o toa do [2;2]*
+//                              {0,0,0,0,0},       //         2  2
+//                              {0,0,0,0,0}};
     private int[][] mayBay3 ={{2,0,2,0,0},       //          2
                              {2,0,0,2,0},       //         2  2
                              {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
