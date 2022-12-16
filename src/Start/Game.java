@@ -1,7 +1,9 @@
 package Start;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.Scanner;
 
@@ -428,6 +430,21 @@ public class Game {
             }
         }
     }
+
+    public void renderResult(GraphicsContext gc, int result, int startX, int startY) {
+        gc.setFont(new Font(40));
+        if (result == 1) {
+            gc.fillText(" DRAW ", startX + 400, startY + 400);
+        }
+        if (result == 0) {
+            gc.fillText(" LOSE ", startX + 400, 400);
+        }
+        if (result == 2) {
+            gc.fillText(" WIN ", startX + 400, 400);
+        }
+    }
+
+
 
 
 

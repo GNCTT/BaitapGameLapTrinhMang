@@ -126,29 +126,23 @@ public class Server
 
     private int result_match;
 
-    static int[][] mayBay ={{0,0,2,0,0},       //          2
-            {0,2,0,0,2},       //         2  2
-            {2,2,2,2,2},       //        22222      *Tam may bay o toa do [2;2]*
-            {0,2,0,0,2},       //         2  2
-            {0,0,2,0,0}};
-
     public Server(int port, int clientID_1, int clientID_2, Game gameClient_1, Game gameClient_2) {
         try {
             server = new ServerSocket(port);
             System.out.println("waiting server game....");
-            socket = server.accept();
-            in_server_game = new DataInputStream(socket.getInputStream());
-            out_server_game = new DataOutputStream(socket.getOutputStream());
+//            socket = server.accept();
+//            in_server_game = new DataInputStream(socket.getInputStream());
+//            out_server_game = new DataOutputStream(socket.getOutputStream());
             byte[] pkt_from_server = new byte[5000];
-            in_server_game.read(pkt_from_server);
-            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
-            System.out.println("???");
-            String res_from_server_game = byteToString(type_byte);
-            match_id = getMatchId(res_from_server_game);
-            System.out.println("matchId: " + match_id);
-            System.out.println("data: " + byteToString(type_byte));
-            JSONObject jsonObject = makeJson_start();
-            out_server_game.write(jsonObject.toString().getBytes());
+//            in_server_game.read(pkt_from_server);
+//            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
+//            System.out.println("???");
+//            String res_from_server_game = byteToString(type_byte);
+//            match_id = getMatchId(res_from_server_game);
+//            System.out.println("matchId: " + match_id);
+//            System.out.println("data: " + byteToString(type_byte));
+//            JSONObject jsonObject = makeJson_start();
+//            out_server_game.write(jsonObject.toString().getBytes());
             client_first = clientID_2;
             this.clientID_1 = clientID_1;
             this.clientID_2 = clientID_2;
@@ -156,8 +150,8 @@ public class Server
             this.gameClient_2 = gameClient_2;
             point_1 = 0;
             point_2 = 0;
-            count_time_client_1 = 100;
-            count_time_client_2 = 100;
+            count_time_client_1 = 500;
+            count_time_client_2 = 500;
             Random random = new Random();
             result_match = -1;
             has_change = true;
@@ -190,23 +184,21 @@ public class Server
 
             JSONObject jsonObject1 = makeJson_match(match_id, 2, 100, 0);
 //            out_server_game.write(jsonObject1.toString().getBytes());
-            out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
-            out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
-                public void handleMessage(String message) {
-                    System.out.println(message);
-                }
-            });
-            out_server_ws.sendMessage(jsonObject1.toString());
+//            out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
+//            out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+//                public void handleMessage(String message) {
+//                    System.out.println(message);
+//                }
+//            });
+//            out_server_ws.sendMessage(jsonObject1.toString());
             System.out.println("hh");
-            Thread.sleep(5000);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (InterruptedException ex) {
-            System.err.println("InterruptedException exception: " + ex.getMessage());
-        } catch (URISyntaxException ex) {
-            System.err.println("URISyntaxException exception: " + ex.getMessage());
         }
+//        catch (URISyntaxException ex) {
+//            System.err.println("URISyntaxException exception: " + ex.getMessage());
+//        }
 
     }
 
@@ -279,8 +271,8 @@ public class Server
     public JSONObject makeJson_start() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", 1);
-        jsonObject.put("ip", "2.tcp.ngrok.io");
-        jsonObject.put("port", 18219);
+        jsonObject.put("ip", "0.tcp.ngrok.io");
+        jsonObject.put("port", 10960);
         jsonObject.put("path", "/shoot_plane");
         return jsonObject;
     }
@@ -529,7 +521,7 @@ public class Server
 
     public void checkWinMatch() {
         System.out.println(count_time_client_1 + " " + count_time_client_2 + " count_time");
-        if (count_time_client_1 == 0 && count_time_client_2 == 0) {
+        if (count_time_client_1 == count_time_client_2) {
             if (gameClient_1.checkLose() && gameClient_2.checkLose()) {
                 result_match = 0;
             } else {
@@ -538,31 +530,53 @@ public class Server
                 } else {
                     if (gameClient_2.checkLose()) {
                         result_match = 1;
-                    } else result_match = 0;
+                    } else result_match = -1;
                 }
             }
+            if (count_time_client_1 == 0) {
+                if (!gameClient_1.checkLose() && !gameClient_2.checkLose()) {
+                    result_match = 0;
+                }
+            }
+            System.out.println("result: " + result_match);
         } else {
-            if (count_time_client_1 == count_time_client_2) {
-                if (gameClient_1.checkLose()) {
-                    result_match = 2;
-                }
-                if (gameClient_2.checkLose()) {
-                    result_match = 1;
-                }
-            }
+            result_match = -1;
         }
+
+//        if (count_time_client_1 == 0 && count_time_client_2 == 0) {
+//            if (gameClient_1.checkLose() && gameClient_2.checkLose()) {
+//                result_match = 0;
+//            } else {
+//                if (gameClient_1.checkLose()) {
+//                    result_match = 2;
+//                } else {
+//                    if (gameClient_2.checkLose()) {
+//                        result_match = 1;
+//                    } else result_match = 0;
+//                }
+//            }
+//        } else {
+//            if (count_time_client_1 == count_time_client_2) {
+//                if (gameClient_1.checkLose() && gameClient_2.checkLose()) {
+//                    result_match = 0;
+//                } else {
+//                    if (gameClient_2.checkLose()) {
+//                        result_match = 1;
+//                    }
+//                    if (gameClient_1.checkLose()) {
+//                        result_match = 2;
+//                    }
+//                }
+//
+//            }
+//        }
     }
 
     public void sendResult() {
-        int score_client_1 = 200 - count_time_client_1;
-        int score_client_2 = 200 - count_time_client_2;
+        int score_client_1 = 200;
+        int score_client_2 = 200;
         JSONObject jsonObject = makeJson_match(match_id, 1, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void sendResult_End() {
@@ -570,11 +584,6 @@ public class Server
         int score_client_2 = 200 - count_time_client_2;
         JSONObject jsonObject = makeJson_match(match_id, 2, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public boolean checkWin() {
@@ -590,6 +599,7 @@ public class Server
     }
 
     public void sendPkt_End() {
+        System.out.println("sendPkt_end");
         int result_1 = -1;
         int result_2 = -1;
         if (result_match == 0) {
@@ -603,6 +613,23 @@ public class Server
         if (result_match == 2) {
             result_1 = 0;
             result_2 = 2;
+        }
+
+        out = outs.get(1);
+        try {
+            ByteBuffer before_send2 = ByteBuffer.allocate(16);
+            type_byte = inttobyte(PKT_END);
+            len_byte = inttobyte(8);
+            ID_byte = inttobyte(clientID_2);
+            result_byte = inttobyte(result_2);
+            System.out.println("---send_to" + clientID_2);
+            before_send2.put(type_byte);
+            before_send2.put(len_byte);
+            before_send2.put(ID_byte);
+            before_send2.put(result_byte);
+            out.write(before_send2.array());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         out = outs.get(0);
 
@@ -622,23 +649,13 @@ public class Server
             throw new RuntimeException(e);
         }
 
-        out = outs.get(1);
-        try {
-            ByteBuffer before_send2 = ByteBuffer.allocate(16);
-            type_byte = inttobyte(PKT_END);
-            len_byte = inttobyte(8);
-            ID_byte = inttobyte(clientID_2);
-            result_byte = inttobyte(result_2);
-            System.out.println("---send_to" + clientID_2);
-            before_send2.put(type_byte);
-            before_send2.put(len_byte);
-            before_send2.put(ID_byte);
-            before_send2.put(result_byte);
-            out.write(before_send2.array());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
+
+    }
+
+
+    public int getResult_Match() {
+        return result_match;
     }
 
     public void senPktTurn() {

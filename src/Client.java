@@ -109,9 +109,6 @@ public class Client {
             outs = new DataOutputStream(clientSocket.getOutputStream());
             status = 0;
             msv = "234";
-//            System.out.print("Nhap ma sv:");
-//            Scanner sc = new Scanner(System.in);
-//            msv = sc.nextLine();
             type_byte = intobyte(0);
             data_byte = Stringtobyte(msv);
             data_length = data_byte.length;

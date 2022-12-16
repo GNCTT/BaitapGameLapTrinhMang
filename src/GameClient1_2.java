@@ -39,7 +39,7 @@ public class GameClient1_2 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("8.tcp.ngrok.io", 15380, game, gameOther);
+        client = new Client("0.tcp.ngrok.io", 13410, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();
@@ -114,7 +114,7 @@ public class GameClient1_2 extends Application {
 //                        render();
 //                        client.has_change = false;
 //                    }
-                    System.out.println("check:   " + clientID + " " + client.getID_receive());
+//                    System.out.println("check:   " + clientID + " " + client.getID_receive());
                     if (client.getID_receive() == clientID) {
                         render();
                         System.out.print("nhap 1 de di chuyen 2 de ban: ");

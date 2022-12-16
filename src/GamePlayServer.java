@@ -24,6 +24,8 @@ public class GamePlayServer extends Application {
     private Game gamePlayer_2;
     private boolean has_change;
 
+    private boolean isOver;
+
 
     private Server server;
 
@@ -42,6 +44,7 @@ public class GamePlayServer extends Application {
         width_map = 20;
         height_map = 20;
         has_change = true;
+        isOver = false;
 
         canvas = new Canvas(WIDTH_DEFAULT * width_map * 2 + 200, HEIGHT_DEFAULT * height_map);
         gc = canvas.getGraphicsContext2D();
@@ -72,18 +75,22 @@ public class GamePlayServer extends Application {
                 } else {
                     if (!server.checkSet2Plane()) {
                         server.waiting_Set_Plane();
+                        System.out.println("result_waiting_pkt: " + 1);
+                        render();
                     } else {
-                        server.waiting_PKT_Play();
+                        if (server.checkWin() == false) {
+                            server.waiting_PKT_Play();
+                        } else {
+                            isOver = true;
+
+//                            render();
+                            break;
+                        }
+
                     }
 
                 }
-//                if (server.checkWin()) {
-//                    System.out.println("have Rs");
-//                    server.sendPkt_End();
-//                    server.sendResult_End();
-//                } else {
-//                    server.sendResult();
-//                }
+
 
             }
 
@@ -91,13 +98,14 @@ public class GamePlayServer extends Application {
 
         threadPool.execute(() -> {
             while (true) {
-
-                if (server.checkWin()) {
+                System.out.println("hm");
+                if (isOver) {
                     System.out.println("have Rs");
                     server.sendPkt_End();
-                    server.sendResult_End();
+                    break;
+//                    server.sendResult_End();
                 } else {
-                    server.sendResult();
+//                    server.sendResult();
                 }
 
             }
@@ -127,6 +135,19 @@ public class GamePlayServer extends Application {
             case 1:
                 gc.fillText("waiting client ", gamePlayer_1.getMap().length * WIDTH_DEFAULT + 50, 100);
                 break;
+        }
+
+        if (server.getResult_Match() == -1) {
+            gc.fillText("Playing", gamePlayer_1.getMap().length * WIDTH_DEFAULT + 20, 200);
+        }
+        if (server.getResult_Match() == 0) {
+            gc.fillText("Draw", gamePlayer_1.getMap().length * WIDTH_DEFAULT + 20, 200);
+        }
+        if (server.getResult_Match() == 1) {
+            gc.fillText("Player 1 Win", gamePlayer_1.getMap().length * WIDTH_DEFAULT + 20, 200);
+        }
+        if (server.getResult_Match() == 2) {
+            gc.fillText("Player 2 Win", gamePlayer_1.getMap().length * WIDTH_DEFAULT + 20, 200);
         }
 
 
