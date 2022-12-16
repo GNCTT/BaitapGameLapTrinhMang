@@ -189,6 +189,7 @@ public class Client {
                     }
                     if (type == PKT_END) {
                         System.out.println("receive Res");
+                        System.out.println("I HAVE RS");
                         result_byte = getBytebyIndex(buffer, 12, 16);
                         is_over = true;
                         result_match = bytetoINT(result_byte);

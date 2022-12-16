@@ -11,5 +11,6 @@
     <orderEntry type="library" name="javax.websocket-api-1.1" level="project" />
     <orderEntry type="library" name="json" level="project" />
     <orderEntry type="library" name="glassfish.tyrus.bundles.standalone.client.jdk" level="project" />
+    <orderEntry type="library" name="googlecode.json.simple" level="project" />
   </component>
 </module>

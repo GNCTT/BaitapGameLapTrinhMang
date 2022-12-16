@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Server
@@ -133,7 +135,7 @@ public class Server
 //            socket = server.accept();
 //            in_server_game = new DataInputStream(socket.getInputStream());
 //            out_server_game = new DataOutputStream(socket.getOutputStream());
-            byte[] pkt_from_server = new byte[5000];
+//            byte[] pkt_from_server = new byte[5000];
 //            in_server_game.read(pkt_from_server);
 //            type_byte = getBytebyIndex(pkt_from_server, 0, 63);
 //            System.out.println("???");
@@ -170,6 +172,16 @@ public class Server
             ins = new ArrayList<>();
             outs = new ArrayList<>();
             clientID_Turn = clientID_1;
+
+            JSONObject jsonObject2 = makeJson_match(2, match_id, 1, 0, 0);
+//            out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
+//            out_server_ws.sendMessage(jsonObject2.toString());
+//            socket = server.accept();
+//            Thread.sleep(2000);
+
+
+            System.out.println("waiting player ....");
+
             while (countClient != 2) {
                 socket = server.accept();
                 in = new DataInputStream(
@@ -182,23 +194,30 @@ public class Server
             }
             System.out.println("Client accepted");
 
-            JSONObject jsonObject1 = makeJson_match(match_id, 2, 100, 0);
-//            out_server_game.write(jsonObject1.toString().getBytes());
 //            out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
-//            out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
-//                public void handleMessage(String message) {
-//                    System.out.println(message);
-//                }
-//            });
+//            out_server_ws.sendMessage(jsonObject2.toString());
+
+            JSONObject jsonObject1 = makeJson_match(2, match_id, 1, 100, 0);
+
 //            out_server_ws.sendMessage(jsonObject1.toString());
+//            Map res2 = new HashMap();
+//            res2.put("result", 2);
+//            res2.put("match", 269);
+//            res2.put("status", 1);
+//            res2.put("id1", 100);
+//            res2.put("id2", 50);
+//            String res2Text = JSONObject.valueToString(res2);
+//
+//            System.out.println(res2Text);
+//
+//            out_server_ws.sendMessage(res2Text);
+
+
             System.out.println("hh");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        catch (URISyntaxException ex) {
-//            System.err.println("URISyntaxException exception: " + ex.getMessage());
-//        }
 
     }
 
@@ -272,16 +291,16 @@ public class Server
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("result", 1);
         jsonObject.put("ip", "0.tcp.ngrok.io");
-        jsonObject.put("port", 10960);
+        jsonObject.put("port", 13410);
         jsonObject.put("path", "/shoot_plane");
         return jsonObject;
     }
 
-    public JSONObject makeJson_match(int match_id, int status, int score_1, int score_2) {
+    public JSONObject makeJson_match(int result, int match_id, int statuss, int score_1, int score_2) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", 2);
+        jsonObject.put("result", result);
         jsonObject.put("match", match_id);
-        jsonObject.put("status", status);
+        jsonObject.put("status", statuss);
         jsonObject.put("id1", score_1);
         jsonObject.put("id2", score_2);
         return jsonObject;
@@ -575,14 +594,14 @@ public class Server
     public void sendResult() {
         int score_client_1 = 200;
         int score_client_2 = 200;
-        JSONObject jsonObject = makeJson_match(match_id, 1, score_client_1, score_client_2);
+        JSONObject jsonObject = makeJson_match(2, match_id, 1, 0, 0);
         out_server_ws.sendMessage(jsonObject.toString());
     }
 
     public void sendResult_End() {
         int score_client_1 = 200 - count_time_client_1;
         int score_client_2 = 200 - count_time_client_2;
-        JSONObject jsonObject = makeJson_match(match_id, 2, score_client_1, score_client_2);
+        JSONObject jsonObject = makeJson_match(2, match_id, 2, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
     }
 
@@ -615,22 +634,7 @@ public class Server
             result_2 = 2;
         }
 
-        out = outs.get(1);
-        try {
-            ByteBuffer before_send2 = ByteBuffer.allocate(16);
-            type_byte = inttobyte(PKT_END);
-            len_byte = inttobyte(8);
-            ID_byte = inttobyte(clientID_2);
-            result_byte = inttobyte(result_2);
-            System.out.println("---send_to" + clientID_2);
-            before_send2.put(type_byte);
-            before_send2.put(len_byte);
-            before_send2.put(ID_byte);
-            before_send2.put(result_byte);
-            out.write(before_send2.array());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
         out = outs.get(0);
 
         try {
@@ -640,6 +644,23 @@ public class Server
             ID_byte = inttobyte(clientID_1);
             result_byte = inttobyte(result_1);
             System.out.println("---send_to" + clientID_1);
+            before_send2.put(type_byte);
+            before_send2.put(len_byte);
+            before_send2.put(ID_byte);
+            before_send2.put(result_byte);
+            out.write(before_send2.array());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        out = outs.get(1);
+        try {
+            ByteBuffer before_send2 = ByteBuffer.allocate(16);
+            type_byte = inttobyte(PKT_END);
+            len_byte = inttobyte(8);
+            ID_byte = inttobyte(clientID_2);
+            result_byte = inttobyte(result_2);
+            System.out.println("---send_to" + clientID_2);
             before_send2.put(type_byte);
             before_send2.put(len_byte);
             before_send2.put(ID_byte);
@@ -718,6 +739,10 @@ public class Server
 
     public int[][] getArr_trap() {
         return arr_trap;
+    }
+
+    public int getmatchId() {
+        return match_id;
     }
 
 }
