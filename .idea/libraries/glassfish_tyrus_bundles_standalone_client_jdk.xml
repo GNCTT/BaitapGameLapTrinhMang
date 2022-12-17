@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="glassfish.tyrus.bundles.standalone.client.jdk" type="repository">
-    <properties maven-id="org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:1.15" />
+    <properties maven-id="org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:LATEST" />
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/tyrus/bundles/tyrus-standalone-client-jdk/1.15/tyrus-standalone-client-jdk-1.15.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/tyrus/bundles/tyrus-standalone-client-jdk/2.1.2/tyrus-standalone-client-jdk-2.1.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
