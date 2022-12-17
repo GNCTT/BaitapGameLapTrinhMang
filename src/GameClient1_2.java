@@ -44,7 +44,7 @@ public class GameClient1_2 extends Application {
         //init
         game = new Game(0, 0);
         gameOther = new GameOther(0, 0);
-        client = new Client("4.tcp.ngrok.io", 18683, game, gameOther);
+        client = new Client("4.tcp.ngrok.io", 17556, game, gameOther);
         client.getArr_Trap();
         clientID = client.getClientID();
         width_map = client.getWidth_map();
@@ -130,7 +130,7 @@ public class GameClient1_2 extends Application {
                         break;
                     }
                     if (client.getID_receive() == clientID) {
-                        int command = 2 ;
+                        int command = rand.nextInt(2) + 1;
 //                        int command = rand.nextInt(2)+1;
 //                        int command = scanner.nextInt();
                         System.out.println();
@@ -144,7 +144,7 @@ public class GameClient1_2 extends Application {
 //                            int dir = scanner.nextInt();
                             client.sendPktPlay(command, dir);
                             client.setID_receive(0);
-//                            render();
+                            render();
 //                        client.readDataFromServer();
 
                         }
@@ -161,6 +161,8 @@ public class GameClient1_2 extends Application {
                                     xFire=19;
                                 }
                             }
+
+
 //                            int x_ = scanner.nextInt();
 //                            int y_ = scanner.nextInt();
                             System.out.println("--------"+xFire +" --- "+yFire);
@@ -207,8 +209,14 @@ public class GameClient1_2 extends Application {
             gc.fillText("Move Your Plane", game.getMap().length * WIDTH_DEFAULT + 10, 50);
         }
         gc.fillText("Your ID: " + String.valueOf(client.getClientID()), game.getMap().length * WIDTH_DEFAULT + 10, 100);
-        gc.fillText("Your ID: " + String.valueOf(client.getID_receive()), game.getMap().length * WIDTH_DEFAULT + 10, 200);
+        if (client.getResult() == 0) {
+            gc.fillText("Miss" , game.getMap().length * WIDTH_DEFAULT + 10, 200);
+        }
+        if (client.getResult() == 1) {
+            gc.fillText("Well Shoot" , game.getMap().length * WIDTH_DEFAULT + 10, 200);
+        }
         gc.setFill(Color.BLUE);
+
         renderMapPlayer();
         renderMapOther();
     }
@@ -218,7 +226,12 @@ public class GameClient1_2 extends Application {
     }
 
     public void renderMapOther() {
+
         gameOther.renderGame(gc, game.getMap().length * WIDTH_DEFAULT + 200, 0);
+        gc.setFill(Color.BLUE);
+        if (xFire >= 0 && yFire >= 0) {
+            gc.fillRect(game.getMap().length * WIDTH_DEFAULT + 200 + xFire * WIDTH_DEFAULT + 1, yFire * HEIGHT_DEFAULT + 1, WIDTH_DEFAULT - 1, HEIGHT_DEFAULT - 1);
+        }
     }
 
     public void renderOver() {

@@ -64,15 +64,15 @@ public class GamePlayServer extends Application {
         gamePlayer_1 = new Game(width_map, height_map);
         gamePlayer_2 = new Game(width_map, height_map);
         server = new Server(8881, 123, 321, gamePlayer_1, gamePlayer_2);
-        match_id = server.getmatchId();
-        JSONObject jsonObject2 = makeJson_match(2, match_id, 1, 0, 0);
-        out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
-        out_server_ws.sendMessage(jsonObject2.toString());
-        out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
-            public void handleMessage(String message) {
-                System.out.println(message);
-            }
-        });
+        match_id = 515;
+        JSONObject jsonObject2 = makeJson_match(2, match_id, 2, 20, 0);
+//        out_server_ws = new WebsocketClientEndpoint(new URI("ws://104.194.240.16/ws/channels/"));
+//        out_server_ws.sendMessage(jsonObject2.toString());
+//        out_server_ws.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+//            public void handleMessage(String message) {
+//                System.out.println(message);
+//            }
+//        });
         arr_trap = server.getArr_trap();
         gamePlayer_1.addTrap(arr_trap);
         gamePlayer_2.addTrap(arr_trap);
@@ -117,17 +117,18 @@ public class GamePlayServer extends Application {
                 if (isOver) {
                     System.out.println("have Rs");
                     server.sendPkt_End();
-                    sendResult_End();
+//                    sendResult_End();
                     render();
                     countSendEnd ++;
-                    if (countSendEnd == 5) {
+                    if (countSendEnd == 20) {
                         countSendEnd = 0;
                         break;
                     }
 //                    break;
 
                 } else {
-                    sendResult();
+                    System.out.println("sendding Rs to Ws");
+//                    sendResult();
                 }
 
             }
@@ -203,15 +204,20 @@ public class GamePlayServer extends Application {
     }
 
     public void sendResult() {
-        int score_client_1 = 200;
-        int score_client_2 = 200;
-        JSONObject jsonObject = makeJson_match(2, match_id, 1, 5, 5);
+        match_id = 515;
+        int score_client_1 = server.getScoreClient1();
+        int score_client_2 = server.getScoreClient2();
+        System.out.println("score: " + score_client_1 + " " + score_client_2 );
+        JSONObject jsonObject = makeJson_match(2, match_id, 1, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
     }
 
     public void sendResult_End() {
-        int score_client_1 = 200 - 400;
-        int score_client_2 = 200 - 400;
+        match_id = 515;
+        int score_client_1 = server.getScoreClient1();
+        int score_client_2 = server.getScoreClient2();
+        System.out.println("scoreend: " + score_client_1 + " " + score_client_2 );
+
         JSONObject jsonObject = makeJson_match(2, match_id, 2, score_client_1, score_client_2);
         out_server_ws.sendMessage(jsonObject.toString());
     }

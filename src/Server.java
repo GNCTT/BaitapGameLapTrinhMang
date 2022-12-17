@@ -7,8 +7,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class Server
@@ -43,6 +41,8 @@ public class Server
 
     private int WIDTH_MAP_SIZE = 20;
     private int HEIGHT_MAP_SIZE = 20;
+    private int scoreClient1 = 0;
+    private int scoreClient2 = 0;
 
     private int NUM_TRAP = 15;
 
@@ -145,6 +145,8 @@ public class Server
 //            System.out.println("data: " + byteToString(type_byte));
 //            JSONObject jsonObject = makeJson_start();
 //            out_server_game.write(jsonObject.toString().getBytes());
+
+
             client_first = clientID_2;
             this.clientID_1 = clientID_1;
             this.clientID_2 = clientID_2;
@@ -152,8 +154,8 @@ public class Server
             this.gameClient_2 = gameClient_2;
             point_1 = 0;
             point_2 = 0;
-            count_time_client_1 = 500;
-            count_time_client_2 = 500;
+            count_time_client_1 = 10;
+            count_time_client_2 = 10;
             Random random = new Random();
             result_match = -1;
             has_change = true;
@@ -243,7 +245,7 @@ public class Server
                 } else {
                     clientID = clientID_2;
                 }
-                pkt_from_client = new byte[5000];
+                pkt_from_client = new byte[50000];
                 try {
                     in.read(pkt_from_client);
                     if (pkt_from_client == null) {
@@ -310,7 +312,7 @@ public class Server
     public void waiting_Set_Plane() {
                 in = ins.get(count_set_plane);
                 out = outs.get(count_set_plane);
-                pkt_from_client = new byte[5000];
+                pkt_from_client = new byte[50000];
                 if (count_set_plane == 0) {
                     clientID = clientID_1;
                 } else {
@@ -390,7 +392,7 @@ public class Server
             out = outs.get(1);
             client_first = clientID_2;
         }
-        pkt_from_client = new byte[5000];
+        pkt_from_client = new byte[50000];
         try {
             in.read(pkt_from_client);
             if (pkt_from_client != null) {
@@ -467,7 +469,7 @@ public class Server
                                     res = 1;
 //                                    gameClient_2.beShoot(x_location, y_location);
                                     has_change = true;
-                                    point_1 = 10;
+                                    scoreClient1 += 10;
                                 } else {
                                     point_1 = 0;
                                 }
@@ -479,6 +481,7 @@ public class Server
                                     res = 1;
                                     has_change = true;
                                     point_2 = 10;
+                                    scoreClient2 += 10;
                                 } else {
                                     point_2 = 0;
                                 }
@@ -589,6 +592,14 @@ public class Server
 //
 //            }
 //        }
+    }
+
+    public int getScoreClient1() {
+        return scoreClient1;
+    }
+
+    public int getScoreClient2() {
+        return scoreClient2;
     }
 
     public void sendResult() {

@@ -23,6 +23,7 @@ public class Client {
     private static final int PKT_RESULT = 6;
 
     private static final int PKT_END = 7;
+    private int result;
 
     private static String msv;
     private int clientID;
@@ -102,6 +103,7 @@ public class Client {
         canMove = false;
         checkMessage = true;
         status = 0;
+        result = -1;
         has_change = true;
         try {
             clientSocket = new Socket(host, port);
@@ -125,7 +127,7 @@ public class Client {
     }
 
     public void readDataFromServer() {
-        buffer = new byte[5000];
+        buffer = new byte[50000];
         try {
             ins.read(buffer);
             if (buffer != null) {
@@ -160,7 +162,7 @@ public class Client {
                             byte result_byte[];
                             status = 4;
                             result_byte = getBytebyIndex(buffer, 12, 16);
-                            int result = bytetoINT(result_byte);
+                            result = bytetoINT(result_byte);
                             System.out.println("result: " + result);
                             result_turn = result;
                             if (result == 0) {
@@ -233,7 +235,7 @@ public class Client {
     }
 
     public int[][] getArr_trap() {
-        buffer = new byte[5000];
+        buffer = new byte[50000];
         try {
             has_change = true;
             ins.read(buffer);
@@ -270,7 +272,7 @@ public class Client {
     }
 
     public void getArr_Trap() {
-        buffer = new byte[5000];
+        buffer = new byte[50000];
         try {
             has_change = true;
             ins.read(buffer);
@@ -444,5 +446,9 @@ public class Client {
         pkt_sent.put(len);
         pkt_sent.put(data);
         return pkt_sent.array();
+    }
+
+    public int getResult() {
+        return result;
     }
 }
